@@ -1,4 +1,3 @@
-'use client'
 import { createFileRoute } from '@tanstack/react-router'
 import { useEffect, useRef, useState, useCallback } from 'react'
 import {
@@ -9,9 +8,7 @@ import {
   AnimatePresence,
 } from 'framer-motion'
 
-export const Route = createFileRoute()({
-  component: ComingSoon,
-});
+export const Route = createFileRoute('/')({ component: ComingSoon })
 
 /* ─── helpers ─── */
 function useCountdown(targetDate: Date) {
