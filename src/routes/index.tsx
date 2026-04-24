@@ -10,25 +10,7 @@ import {
 
 export const Route = createFileRoute('/')({ component: ComingSoon })
 
-/* ─── helpers ─── */
-function useCountdown(targetDate: Date) {
-  const calc = () => {
-    const diff = targetDate.getTime() - Date.now()
-    if (diff <= 0) return { d: 0, h: 0, m: 0, s: 0 }
-    return {
-      d: Math.floor(diff / 86400000),
-      h: Math.floor((diff % 86400000) / 3600000),
-      m: Math.floor((diff % 3600000) / 60000),
-      s: Math.floor((diff % 60000) / 1000),
-    }
-  }
-  const [time, setTime] = useState(calc)
-  useEffect(() => {
-    const id = setInterval(() => setTime(calc()), 1000)
-    return () => clearInterval(id)
-  }, [])
-  return time
-}
+
 
 /* ─── particle canvas ─── */
 function Particles() {
@@ -85,31 +67,6 @@ function Particles() {
   return <canvas ref={canvasRef} id="particle-canvas" style={{ position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none' }} />
 }
 
-/* ─── countdown box ─── */
-function CountBox({ value, label }: { value: number; label: string }) {
-  return (
-    <motion.div
-      className="countdown-box flex flex-col items-center justify-center w-24 h-24 md:w-32 md:h-32"
-      whileHover={{ scale: 1.06, borderColor: 'rgba(41,112,232,0.7)' }}
-    >
-      <AnimatePresence mode="popLayout">
-        <motion.span
-          key={value}
-          initial={{ y: -20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          exit={{ y: 20, opacity: 0 }}
-          transition={{ duration: 0.3 }}
-          className="text-4xl md:text-5xl font-bold text-white"
-          style={{ fontFamily: 'Space Grotesk, Inter, sans-serif', textShadow: '0 0 20px rgba(41,112,232,0.6)' }}
-        >
-          {String(value).padStart(2, '0')}
-        </motion.span>
-      </AnimatePresence>
-      <span className="text-xs md:text-sm font-medium mt-1 tracking-widest uppercase" style={{ color: 'rgba(74,138,244,0.8)' }}>{label}</span>
-    </motion.div>
-  )
-}
-
 /* ─── feature card ─── */
 const features = [
   { icon: '🗺️', title: 'Event Blueprints', desc: 'Design detailed floor plans and layouts for any type of event with precision drag-and-drop tools.' },
@@ -117,7 +74,7 @@ const features = [
   { icon: '⚡', title: 'Real-Time Collaboration', desc: 'Invite your team, vendors, and clients to co-plan events live — all from one dashboard.' },
   { icon: '📐', title: 'Smart Templates', desc: 'Kick-start your event with intelligent templates tailored for weddings, conferences, galas, and more.' },
   { icon: '🎨', title: 'Decor Simulation', desc: 'Place virtual décor, lighting, and furniture to see how everything looks before you commit.' },
-  { icon: '📊', title: 'Guest Flow Analytics', desc: 'Analyze traffic patterns and optimize seating arrangements with built-in AI-powered insights.' },
+  { icon: '📊', title: 'Compliance Integration', desc: 'Fire safety regulations, Capacity limits, Accessibility requirements and Venue-specific constraints with built-in AI-powered insights.' },
 ]
 
 function FeatureCard({ f, i }: { f: typeof features[0]; i: number }) {
@@ -142,38 +99,38 @@ function FeatureCard({ f, i }: { f: typeof features[0]; i: number }) {
 /* ─── orbit logo ─── */
 function OrbitLogo() {
   return (
-    <div className="relative flex items-center justify-center" style={{ width: 320, height: 320 }}>
+    <div className="relative flex items-center justify-center" style={{ width: 440, height: 440 }}>
       {/* outer ring */}
       <motion.div
         className="absolute rounded-full border"
-        style={{ width: 300, height: 300, borderColor: 'rgba(41,112,232,0.15)' }}
+        style={{ width: 420, height: 420, borderColor: 'rgba(41,112,232,0.18)' }}
         animate={{ rotate: 360 }}
         transition={{ duration: 30, repeat: Infinity, ease: 'linear' }}
       >
         {[0, 90, 180, 270].map(deg => (
-          <div key={deg} className="absolute w-2 h-2 rounded-full" style={{ background: '#2970e8', top: '50%', left: '50%', transform: `rotate(${deg}deg) translateX(148px) translateY(-50%)` }} />
+          <div key={deg} className="absolute w-3 h-3 rounded-full" style={{ background: '#2970e8', top: '50%', left: '50%', transform: `rotate(${deg}deg) translateX(208px) translateY(-50%)` }} />
         ))}
       </motion.div>
       {/* middle ring */}
       <motion.div
         className="absolute rounded-full border"
-        style={{ width: 210, height: 210, borderColor: 'rgba(41,112,232,0.2)' }}
+        style={{ width: 290, height: 290, borderColor: 'rgba(41,112,232,0.25)' }}
         animate={{ rotate: -360 }}
         transition={{ duration: 18, repeat: Infinity, ease: 'linear' }}
       >
         {[45, 135, 225, 315].map(deg => (
-          <div key={deg} className="absolute w-3 h-3 rounded-full" style={{ background: '#1a5ecf', top: '50%', left: '50%', transform: `rotate(${deg}deg) translateX(103px) translateY(-50%)` }} />
+          <div key={deg} className="absolute w-4 h-4 rounded-full" style={{ background: '#1a5ecf', top: '50%', left: '50%', transform: `rotate(${deg}deg) translateX(143px) translateY(-50%)` }} />
         ))}
       </motion.div>
-      {/* glow behind logo */}
-      <div className="absolute rounded-full" style={{ width: 110, height: 110, background: 'radial-gradient(circle, rgba(41,112,232,0.4) 0%, transparent 70%)' }} />
+      {/* white glow behind logo */}
+      <div className="absolute rounded-full pointer-events-none" style={{ width: 260, height: 260, background: 'radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(255,255,255,0.8) 40%, transparent 70%)', filter: 'blur(20px)' }} />
       {/* logo */}
       <motion.img
         src="/mainLogo.svg"
         alt="EventSpacePro Logo"
         className="relative z-10"
-        style={{ width: 100, filter: 'drop-shadow(0 0 18px rgba(41,112,232,0.7))' }}
-        animate={{ scale: [1, 1.04, 1] }}
+        style={{ width: 180, filter: 'drop-shadow(0 0 10px rgba(255,255,255,0.5))' }}
+        animate={{ scale: [1, 1.03, 1] }}
         transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
       />
     </div>
@@ -238,11 +195,11 @@ function NotifyForm() {
 
 /* ─── main page ─── */
 export default function ComingSoon() {
-  const { d, h, m, s } = useCountdown(new Date('2025-09-01T00:00:00'))
   const [showTop, setShowTop] = useState(false)
   const { scrollY } = useScroll()
   const heroY = useTransform(scrollY, [0, 600], [0, -120])
   const heroOpacity = useTransform(scrollY, [0, 400], [1, 0.3])
+  const bgY = useTransform(scrollY, [0, 1500], [0, 350])
 
   useEffect(() => {
     const unsub = scrollY.on('change', v => setShowTop(v > 400))
@@ -257,6 +214,20 @@ export default function ComingSoon() {
 
   return (
     <div className="relative min-h-screen" style={{ background: '#050d1f' }}>
+      {/* parallax background layer */}
+      <motion.div
+        className="fixed inset-0 z-0 opacity-15 pointer-events-none"
+        style={{
+          backgroundImage: 'url(/bg.jpg)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          y: bgY,
+        }}
+      />
+      {/* bottom fade for background */}
+      <div className="fixed inset-0 z-0 bg-gradient-to-b from-transparent via-[#050d1f]/50 to-[#050d1f] pointer-events-none" />
+      <div className="fixed inset-0 z-0 bg-gradient-to-t from-[#050d1f]/80 via-transparent to-transparent pointer-events-none" />
+
       <Particles />
 
       {/* ── Hero ── */}
@@ -307,18 +278,7 @@ export default function ComingSoon() {
             Design stunning event blueprints, walk through immersive <strong style={{ color: '#4a8af4' }}>3D spaces</strong>, and plan every detail — before a single chair is placed.
           </motion.p>
 
-          {/* countdown */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1, duration: 0.7 }}
-            className="flex gap-4 mt-4"
-          >
-            <CountBox value={d} label="Days" />
-            <CountBox value={h} label="Hours" />
-            <CountBox value={m} label="Mins" />
-            <CountBox value={s} label="Secs" />
-          </motion.div>
+
 
           {/* CTA */}
           <motion.div
@@ -424,70 +384,7 @@ export default function ComingSoon() {
         </div>
       </section>
 
-      {/* ── 3D preview teaser ── */}
-      <section className="relative z-10 py-24 px-6 overflow-hidden" style={{ background: 'linear-gradient(180deg, #050d1f 0%, #070f25 50%, #050d1f 100%)' }}>
-        <div className="divider mb-24" />
-        <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center gap-16">
-          {/* visual */}
-          <motion.div
-            className="relative flex-shrink-0"
-            initial={{ opacity: 0, x: -60 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-          >
-            <div className="relative w-64 h-64 md:w-80 md:h-80">
-              <div className="absolute inset-0 rounded-3xl" style={{ background: 'linear-gradient(135deg, rgba(13,27,62,0.9) 0%, rgba(26,47,94,0.6) 100%)', border: '1px solid rgba(41,112,232,0.25)' }} />
-              {/* fake 3d grid */}
-              <div className="absolute inset-6 grid grid-cols-4 grid-rows-4 gap-1.5">
-                {Array.from({ length: 16 }).map((_, i) => (
-                  <motion.div
-                    key={i}
-                    className="rounded"
-                    style={{ background: i % 3 === 0 ? 'rgba(41,112,232,0.5)' : i % 5 === 0 ? 'rgba(41,112,232,0.25)' : 'rgba(41,112,232,0.08)', border: '1px solid rgba(41,112,232,0.2)' }}
-                    animate={{ opacity: [0.6, 1, 0.6] }}
-                    transition={{ duration: 2 + i * 0.2, repeat: Infinity }}
-                  />
-                ))}
-              </div>
-              {/* label */}
-              <div className="absolute bottom-4 left-4 right-4 text-center">
-                <span className="text-xs font-semibold tracking-widest uppercase" style={{ color: '#4a8af4' }}>3D Floor Plan</span>
-              </div>
-              {/* glow */}
-              <div className="absolute -inset-4 rounded-3xl pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(41,112,232,0.12) 0%, transparent 70%)' }} />
-            </div>
-          </motion.div>
 
-          {/* text */}
-          <motion.div
-            initial={{ opacity: 0, x: 60 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-          >
-            <p className="text-xs font-semibold tracking-widest uppercase mb-4" style={{ color: '#4a8af4' }}>3D Visualization</p>
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-6" style={{ fontFamily: 'Space Grotesk, sans-serif', lineHeight: 1.2 }}>
-              See your event before<br />
-              <span style={{ color: '#2970e8' }}>it ever happens</span>
-            </h2>
-            <p className="text-base leading-relaxed mb-8" style={{ color: 'rgba(180,200,255,0.7)' }}>
-              Our powerful 3D engine lets you place tables, stages, decor, and lighting in a photorealistic virtual space — giving you and your clients absolute confidence before a single booking is made.
-            </p>
-            <div className="flex flex-col gap-3">
-              {['Real-time rendering', 'VR-ready walkthrough', 'Exportable blueprints'].map(item => (
-                <div key={item} className="flex items-center gap-3">
-                  <div className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(41,112,232,0.2)', border: '1px solid rgba(41,112,232,0.4)' }}>
-                    <span style={{ color: '#4a8af4', fontSize: 10 }}>✓</span>
-                  </div>
-                  <span className="text-sm" style={{ color: 'rgba(180,200,255,0.75)' }}>{item}</span>
-                </div>
-              ))}
-            </div>
-          </motion.div>
-        </div>
-        <div className="divider mt-24" />
-      </section>
 
       {/* ── notify ── */}
       <section id="notify" className="relative z-10 py-24 px-6">
