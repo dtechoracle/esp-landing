@@ -1,0 +1,324 @@
+/* ===== Design tokens (from Green Room / EventSpacePro design system) ===== */
+:root {
+  /* brand */
+  --navy-900: #021938;
+  --blue-700: #0155a8;
+  --blue-600: #0056a9;
+  --blue-500: #1e6bb8;
+  --purple-600: #4e1cd8;
+  --ink-900: #272235;
+  --black: #000000;
+
+  /* neutrals */
+  --white: #ffffff;
+  --surface-0: #fdfdff;
+  --surface-page: #f6f4fa;
+  --surface-sunken: #f9f9f9;
+  --surface-sunken-2: #f9fafb;
+  --lavender-tint: #f6f4fa;
+  --line-100: #f9fafb;
+  --line-200: #e6e6e6;
+  --line-300: #d9d9d9;
+  --line-400: #d0d0d0;
+  --line-500: #c9c9c9;
+  --gray-500: #6b7280;
+  --gray-600: #666666;
+  --gray-700: #151515;
+
+  /* semantic */
+  --success-500: #10b981;
+  --mint-100: #eaf6ef;
+  --error-500: #ef4444;
+
+  /* text */
+  --text-primary: var(--ink-900);
+  --text-primary-strong: var(--black);
+  --text-inverse: var(--surface-0);
+  --text-muted: color-mix(in oklch, var(--ink-900) 65%, transparent);
+  --text-faint: color-mix(in oklch, var(--ink-900) 45%, transparent);
+
+  /* surfaces */
+  --surface-card: var(--surface-0);
+  --surface-app: var(--surface-page);
+  --surface-input: color-mix(in oklch, var(--ink-900) 3%, white);
+  --surface-input-border: color-mix(in oklch, var(--ink-900) 10%, transparent);
+
+  /* interactive */
+  --accent: var(--blue-600);
+  --accent-hover: #004a8f;
+  --accent-active: #003f7a;
+  --brand-dark: var(--navy-900);
+  --focus-ring: color-mix(in oklch, var(--blue-600) 45%, transparent);
+
+  /* typography */
+  --font-sans: "Instrument Sans", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-serif-display: "Instrument Serif", Georgia, "Times New Roman", serif;
+
+  /* spacing (6px base unit) */
+  --space-1: 6px;
+  --space-2: 12px;
+  --space-3: 16px;
+  --space-4: 20px;
+  --space-5: 24px;
+  --space-6: 30px;
+  --space-7: 36px;
+  --space-8: 40px;
+  --space-9: 48px;
+  --space-10: 54px;
+  --space-11: 60px;
+  --space-12: 72px;
+
+  /* radii */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 24px;
+  --radius-xl: 32px;
+  --radius-pill: 999px;
+  --radius-round: 50%;
+
+  /* shadows */
+  --shadow-card: 0 0 0 0.5px rgba(0, 0, 0, 0.02),
+    inset 0 0 0 0.5px rgba(0, 0, 0, 0.02);
+  --shadow-panel: 0 3px 5px -1.25px rgba(255, 255, 255, 0.14),
+    0 1.25px 1.25px rgba(255, 255, 255, 0.08);
+  --shadow-dropdown: 0 10px 30px rgba(0, 0, 0, 0.08),
+    0 2px 8px rgba(0, 0, 0, 0.05);
+  --shadow-focus: 0 0 0 3px var(--focus-ring);
+  --shadow-btn-hover: 0 4px 14px rgba(0, 86, 169, 0.25);
+
+  /* mock editor canvas layout (responsive) */
+  --mock-height: 360px;
+  --mock-stage-top: 48px;
+  --mock-stage-left: 48px;
+  --mock-stage-w: 120px;
+  --mock-stage-h: 64px;
+  --mock-circles-top: 150px;
+  --mock-circles-left: 60px;
+  --mock-buffet-top: 60px;
+  --mock-buffet-right: 52px;
+  --mock-buffet-w: 96px;
+  --mock-buffet-h: 150px;
+  --mock-dance-bottom: 44px;
+  --mock-dance-right: 52px;
+  --mock-dance-w: 150px;
+  --mock-dance-h: 70px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: var(--surface-page);
+  color: var(--ink-900);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+a {
+  color: var(--blue-600);
+  text-decoration: none;
+}
+a:hover {
+  color: var(--accent-hover);
+}
+
+h1,
+h2,
+h3,
+p {
+  text-wrap: pretty;
+}
+
+@keyframes espFloat {
+  0%,
+  100% {
+    transform: translateX(-50%) translateY(0);
+  }
+  50% {
+    transform: translateX(-50%) translateY(-8px);
+  }
+}
+@keyframes espPulse {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* ===== Layout helpers ===== */
+.container {
+  max-width: 1240px;
+  width: 100%;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+/* ===== Responsive grid classes ===== */
+.grid-hero {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  align-items: center;
+}
+.grid-features {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+.grid-steps {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+}
+.grid-audience {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+/* ===== Responsive breakpoints ===== */
+@media (max-width: 1024px) {
+  .grid-features {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .grid-steps {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 900px) {
+  :root {
+    /* tighten hero type on tablet */
+    --hero-h1: 48px;
+  }
+  .grid-hero {
+    gap: 48px;
+  }
+}
+
+@media (max-width: 767px) {
+  .grid-hero {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+  .grid-features {
+    grid-template-columns: 1fr;
+  }
+  .grid-steps {
+    grid-template-columns: 1fr;
+  }
+  .grid-audience {
+    grid-template-columns: 1fr;
+  }
+
+  /* nav: collapse to hamburger */
+  .esp-nav-desktop {
+    display: none !important;
+  }
+  header [aria-label="Toggle menu"] {
+    display: flex !important;
+  }
+  .esp-capacity-chip {
+    left: -4px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  html {
+    font-size: 15px;
+  }
+  .grid-hero h1 {
+    font-size: 40px !important;
+  }
+  .grid-hero > div > p {
+    font-size: 16px !important;
+  }
+  section h2 {
+    font-size: 30px !important;
+  }
+
+  /* shrink the mock editor so its shapes never overlap */
+  :root {
+    --mock-height: 300px;
+    --mock-stage-top: 40px;
+    --mock-stage-left: 40px;
+    --mock-stage-w: 92px;
+    --mock-stage-h: 56px;
+    --mock-circles-top: 132px;
+    --mock-circles-left: 48px;
+    --mock-buffet-top: 52px;
+    --mock-buffet-right: 32px;
+    --mock-buffet-w: 78px;
+    --mock-buffet-h: 118px;
+    --mock-dance-bottom: 32px;
+    --mock-dance-right: 32px;
+    --mock-dance-w: 118px;
+    --mock-dance-h: 56px;
+  }
+
+  /* tighten section gutters */
+  .esp-section {
+    padding-left: 20px !important;
+    padding-right: 20px !important;
+  }
+
+  /* stack email + join on very narrow screens */
+  .esp-waitlist-actions {
+    flex-direction: column !important;
+  }
+  .esp-waitlist-actions > input {
+    width: 100% !important;
+  }
+  .esp-waitlist-actions > button {
+    width: 100% !important;
+  }
+
+  .esp-audience-card {
+    padding: 24px !important;
+  }
+
+  footer h2 {
+    font-size: 32px !important;
+  }
+}
+
+@media (max-width: 380px) {
+  .grid-hero h1 {
+    font-size: 34px !important;
+  }
+}
+
+/* ===== Admin responsive ===== */
+@media (max-width: 767px) {
+  .esp-admin-sidebar {
+    display: none !important;
+  }
+  .esp-admin-toggle {
+    display: block !important;
+  }
+}
+
+@media (min-width: 768px) {
+  .esp-admin-mobile-nav {
+    display: none !important;
+  }
+}
+
+@media (max-width: 480px) {
+  html {
+    font-size: 15px;
+  }
+}

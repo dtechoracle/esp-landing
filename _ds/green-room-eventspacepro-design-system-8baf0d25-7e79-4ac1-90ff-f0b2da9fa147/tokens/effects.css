@@ -1,0 +1,19 @@
+:root{
+--radius-sm:8px;
+--radius-md:12px;
+--radius-lg:24px;
+--radius-xl:32px;
+--radius-pill:999px;
+--radius-round:50%;
+
+--shadow-card:0 0 0 0.5px rgba(0,0,0,0.02), inset 0 0 0 0.5px rgba(0,0,0,0.02);
+--shadow-panel:0 3px 5px -1.25px rgba(255,255,255,0.14), 0 1.25px 1.25px rgba(255,255,255,0.08);
+--shadow-dropdown:0 10px 30px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.05);
+--shadow-focus:0 0 0 3px var(--focus-ring);
+--shadow-btn-hover:0 4px 14px rgba(0,86,169,0.25);
+
+--ease-standard:cubic-bezier(0.4,0,0.2,1); /* @kind other */
+--duration-fast:150ms; /* @kind other */
+--duration-standard:200ms; /* @kind other */
+--duration-slow:300ms; /* @kind other */
+}

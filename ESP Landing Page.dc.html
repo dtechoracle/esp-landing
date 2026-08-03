@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/green-room-eventspacepro-design-system-8baf0d25-7e79-4ac1-90ff-f0b2da9fa147/tokens/colors.css">
+  <link rel="stylesheet" href="_ds/green-room-eventspacepro-design-system-8baf0d25-7e79-4ac1-90ff-f0b2da9fa147/tokens/typography.css">
+  <link rel="stylesheet" href="_ds/green-room-eventspacepro-design-system-8baf0d25-7e79-4ac1-90ff-f0b2da9fa147/tokens/spacing.css">
+  <link rel="stylesheet" href="_ds/green-room-eventspacepro-design-system-8baf0d25-7e79-4ac1-90ff-f0b2da9fa147/tokens/effects.css">
+  <link rel="stylesheet" href="_ds/green-room-eventspacepro-design-system-8baf0d25-7e79-4ac1-90ff-f0b2da9fa147/styles.css">
+  <script src="_ds/green-room-eventspacepro-design-system-8baf0d25-7e79-4ac1-90ff-f0b2da9fa147/_ds_bundle.js"></script>
+  <style>
+    body{margin:0;background:var(--surface-page);color:var(--ink-900);font-family:var(--font-sans);}
+    a{color:var(--blue-600);text-decoration:none;}
+    a:hover{color:var(--accent-hover);}
+    @keyframes espFloat{0%,100%{transform:translateX(-50%) translateY(0);}50%{transform:translateX(-50%) translateY(-8px);}}
+    @keyframes espPulse{0%,100%{opacity:0.55;}50%{opacity:1;}}
+  </style>
+</helmet>
+
+<div style="min-height:100vh;display:flex;flex-direction:column;">
+
+  <!-- Nav -->
+  <header style="display:flex;align-items:center;justify-content:space-between;padding:20px 48px;max-width:1240px;width:100%;margin:0 auto;box-sizing:border-box;">
+    <img src="assets/mainLogo.svg" alt="EventSpacePro" style="height:34px;">
+    <nav style="display:flex;align-items:center;gap:30px;font-weight:500;font-size:15px;letter-spacing:-0.015em;">
+      <a href="#features" style="color:var(--ink-900);">Features</a>
+      <a href="#how" style="color:var(--ink-900);">How it works</a>
+      <a href="#audiences" style="color:var(--ink-900);">Who it's for</a>
+      <x-import component-from-global-scope="GreenRoomEventSpaceProDesignSystem_8baf0d.Button" size="sm" on-click="{{ scrollToWaitlist }}" hint-size="140px,36px">Join the waitlist</x-import>
+    </nav>
+  </header>
+
+  <!-- Hero -->
+  <section data-screen-label="Hero" style="max-width:1240px;width:100%;margin:0 auto;box-sizing:border-box;padding:60px 48px 72px;display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;">
+    <div style="display:flex;flex-direction:column;gap:24px;">
+      <sc-if value="{{ showBadge }}" hint-placeholder-val="{{ true }}">
+        
+      </sc-if>
+      <h1 style="margin:0;font-size:56px;line-height:1.05;font-weight:600;letter-spacing:-0.03em;text-wrap:pretty;">Design, book, and visualize event spaces in one place.</h1>
+      <p style="margin:0;font-size:18px;line-height:1.45;font-weight:500;letter-spacing:-0.015em;color:var(--text-muted);max-width:480px;text-wrap:pretty;">EventSpacePro turns any venue into an editable 2D floor plan, a walkable 3D preview, and an AI assistant that lays out your event from a single prompt.</p>
+
+      <!-- Waitlist form -->
+      <div id="waitlist" style="background:var(--surface-card);border-radius:var(--radius-lg);box-shadow:var(--shadow-card);padding:24px;display:flex;flex-direction:column;gap:16px;max-width:480px;box-sizing:border-box;">
+        <sc-if value="{{ submitted }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:8px;padding:12px 0;">
+            <span style="font-size:20px;font-weight:600;letter-spacing:-0.02em;">You're on the list!</span>
+            <span style="font-size:15px;color:var(--text-muted);font-weight:500;">{{ confirmCopy }}</span>
+          </div>
+        </sc-if>
+        <sc-if value="{{ notSubmitted }}" hint-placeholder-val="{{ true }}">
+          <span style="font-size:16px;font-weight:600;letter-spacing:-0.015em;">Get early access</span>
+          <div style="display:flex;gap:10px;">
+            <label style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px;height:44px;border-radius:var(--radius-md);cursor:pointer;font-size:14px;font-weight:600;letter-spacing:-0.015em;transition:all 150ms ease;background:{{ plannerBg }};color:{{ plannerColor }};box-shadow:{{ plannerRing }};" onClick="{{ pickPlanner }}">Event planner</label>
+            <label style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px;height:44px;border-radius:var(--radius-md);cursor:pointer;font-size:14px;font-weight:600;letter-spacing:-0.015em;transition:all 150ms ease;background:{{ venueBg }};color:{{ venueColor }};box-shadow:{{ venueRing }};" onClick="{{ pickVenue }}">Venue owner</label>
+          </div>
+          <div style="display:flex;gap:10px;">
+            <input type="email" placeholder="you@company.com" value="{{ email }}" onChange="{{ onEmail }}" style="flex:1;height:46px;border:none;outline:none;border-radius:var(--radius-md);background:var(--surface-input);box-shadow:inset 0 0 0 0.5px var(--surface-input-border);padding:0 16px;font-family:var(--font-sans);font-size:16px;font-weight:500;letter-spacing:-0.015em;color:var(--ink-900);box-sizing:border-box;" style-focus="box-shadow:0 0 0 1.5px var(--accent);">
+            <x-import component-from-global-scope="GreenRoomEventSpaceProDesignSystem_8baf0d.Button" size="md" on-click="{{ submit }}" hint-size="120px,46px">Join</x-import>
+          </div>
+          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:14px;font-weight:500;letter-spacing:-0.015em;color:var(--ink-900);" onClick="{{ toggleWhatsapp }}">
+            <span style="width:20px;height:20px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;transition:all 150ms ease;background:{{ waBoxBg }};color:white;box-shadow:{{ waBoxRing }};">{{ waCheck }}</span>
+            Also get updates on WhatsApp
+          </label>
+          <sc-if value="{{ whatsappOn }}" hint-placeholder-val="{{ false }}">
+            <input type="tel" placeholder="+1 555 000 0000" value="{{ phone }}" onChange="{{ onPhone }}" style="height:46px;border:none;outline:none;border-radius:var(--radius-md);background:var(--surface-input);box-shadow:inset 0 0 0 0.5px var(--surface-input-border);padding:0 16px;font-family:var(--font-sans);font-size:16px;font-weight:500;letter-spacing:-0.015em;color:var(--ink-900);box-sizing:border-box;" style-focus="box-shadow:0 0 0 1.5px var(--accent);">
+          </sc-if>
+          <sc-if value="{{ error }}" hint-placeholder-val="{{ false }}">
+            <span style="font-size:13px;color:var(--error-500);font-weight:500;">{{ error }}</span>
+          </sc-if>
+          <span style="font-size:12px;color:var(--text-faint);font-weight:400;">No spam. One email when your invite is ready.</span>
+        </sc-if>
+      </div>
+    </div>
+
+    <!-- Mock editor -->
+    <div style="position:relative;">
+      <div style="background:var(--surface-card);border-radius:var(--radius-lg);box-shadow:var(--shadow-dropdown);overflow:hidden;">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--surface-sunken-2);">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="width:10px;height:10px;border-radius:50%;background:var(--line-300);"></span>
+            <span style="width:10px;height:10px;border-radius:50%;background:var(--line-300);"></span>
+            <span style="width:10px;height:10px;border-radius:50%;background:var(--line-300);"></span>
+          </div>
+          <span style="font-size:12px;font-weight:600;color:var(--text-muted);letter-spacing:-0.015em;">Rivera Wedding — Grand Hall</span>
+          <span style="font-size:11px;font-weight:600;background:var(--blue-600);color:white;border-radius:var(--radius-pill);padding:4px 10px;">3D preview</span>
+        </div>
+        <div style="position:relative;height:360px;background:repeating-linear-gradient(0deg, transparent 0 23px, rgba(2,25,56,0.05) 23px 24px), repeating-linear-gradient(90deg, transparent 0 23px, rgba(2,25,56,0.05) 23px 24px), var(--surface-0);">
+          <div style="position:absolute;inset:24px 24px 24px 24px;border:2px solid var(--navy-900);border-radius:4px;"></div>
+          <div style="position:absolute;top:48px;left:48px;width:120px;height:64px;background:rgba(0,86,169,0.12);border:1.5px solid var(--blue-600);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:var(--blue-700);">Stage</div>
+          <div style="position:absolute;top:150px;left:60px;display:grid;grid-template-columns:repeat(4, 26px);gap:14px;">
+            <span style="width:26px;height:26px;border-radius:50%;border:1.5px solid var(--ink-900);opacity:0.55;"></span>
+            <span style="width:26px;height:26px;border-radius:50%;border:1.5px solid var(--ink-900);opacity:0.55;"></span>
+            <span style="width:26px;height:26px;border-radius:50%;border:1.5px solid var(--ink-900);opacity:0.55;"></span>
+            <span style="width:26px;height:26px;border-radius:50%;border:1.5px solid var(--ink-900);opacity:0.55;"></span>
+            <span style="width:26px;height:26px;border-radius:50%;border:1.5px solid var(--ink-900);opacity:0.55;"></span>
+            <span style="width:26px;height:26px;border-radius:50%;border:1.5px solid var(--ink-900);opacity:0.55;"></span>
+            <span style="width:26px;height:26px;border-radius:50%;border:1.5px solid var(--ink-900);opacity:0.55;"></span>
+            <span style="width:26px;height:26px;border-radius:50%;border:1.5px solid var(--ink-900);opacity:0.55;"></span>
+          </div>
+          <div style="position:absolute;top:60px;right:52px;width:96px;height:150px;background:rgba(39,34,53,0.06);border:1.5px dashed var(--gray-500);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:var(--gray-500);">Buffet</div>
+          <div style="position:absolute;bottom:44px;right:52px;width:150px;height:70px;background:rgba(78,28,216,0.08);border:1.5px solid var(--purple-600);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:var(--purple-600);">Dance floor</div>
+          <!-- AI prompt chip -->
+          <div style="position:absolute;left:50%;bottom:18px;transform:translateX(-50%);display:flex;align-items:center;gap:10px;background:var(--navy-900);color:white;border-radius:var(--radius-pill);padding:10px 18px;box-shadow:var(--shadow-dropdown);animation:espFloat 5s ease-in-out infinite;max-width:calc(100% - 48px);box-sizing:border-box;">
+            <span style="color:#9db8ff;font-size:14px;flex-shrink:0;">✦</span>
+            <span style="font-size:13px;font-weight:500;letter-spacing:-0.015em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">"Seat 120 guests banquet-style"</span>
+          </div>
+          <!-- toolbar -->
+          <div style="position:absolute;top:50%;left:-1px;transform:translateY(-50%);display:flex;flex-direction:column;gap:6px;background:var(--surface-card);border-radius:0 12px 12px 0;box-shadow:var(--shadow-dropdown);padding:8px 6px;">
+            <span style="width:30px;height:30px;border-radius:8px;background:var(--blue-600);color:white;display:flex;align-items:center;justify-content:center;font-size:14px;">⬚</span>
+            <span style="width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--ink-900);">▭</span>
+            <span style="width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--ink-900);">○</span>
+            <span style="width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--ink-900);">✋</span>
+          </div>
+        </div>
+      </div>
+      <div style="position:absolute;bottom:-16px;left:-12px;background:var(--surface-card);border-radius:var(--radius-md);box-shadow:var(--shadow-dropdown);padding:10px 16px;display:flex;flex-direction:column;gap:2px;">
+        <span style="font-size:12px;font-weight:500;color:var(--text-muted);">Capacity</span>
+        <span style="font-size:16px;font-weight:700;letter-spacing:-0.02em;">120/150 Guests</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section id="features" data-screen-label="Features" style="background:var(--surface-card);">
+    <div style="max-width:1240px;margin:0 auto;padding:72px 48px;box-sizing:border-box;display:flex;flex-direction:column;gap:48px;">
+      <div style="display:flex;flex-direction:column;gap:12px;max-width:560px;">
+        <span style="font-size:13px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--blue-600);">Features</span>
+        <h2 style="margin:0;font-size:36px;font-weight:600;letter-spacing:-0.03em;line-height:1.1;">Everything between the idea and the event.</h2>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3, 1fr);gap:24px;">
+        <div style="background:var(--surface-page);border-radius:var(--radius-lg);padding:30px;display:flex;flex-direction:column;gap:14px;">
+          <span style="width:44px;height:44px;border-radius:var(--radius-md);background:rgba(0,86,169,0.1);color:var(--blue-600);display:flex;align-items:center;justify-content:center;font-size:20px;">⬚</span>
+          <h3 style="margin:0;font-size:20px;font-weight:600;letter-spacing:-0.02em;">2D floor-plan editor</h3>
+          <p style="margin:0;font-size:15px;line-height:1.45;font-weight:500;color:var(--text-muted);text-wrap:pretty;">Drag-and-drop walls, tables, stages, and assets on a precise grid. Real dimensions, real capacity counts — no CAD required.</p>
+        </div>
+        
+        <div style="background:var(--surface-page);border-radius:var(--radius-lg);padding:30px;display:flex;flex-direction:column;gap:14px;">
+          <span style="width:44px;height:44px;border-radius:var(--radius-md);background:rgba(78,28,216,0.1);color:var(--purple-600);display:flex;align-items:center;justify-content:center;font-size:20px;">✦</span>
+          <h3 style="margin:0;font-size:20px;font-weight:600;letter-spacing:-0.02em;">AI layout assistant</h3>
+          <p style="margin:0;font-size:15px;line-height:1.45;font-weight:500;color:var(--text-muted);text-wrap:pretty;">Describe the event — "250 guests, theater seating, two bars" — and get a compliant layout in seconds. Then tweak it by hand.</p>
+        </div><div style="background:var(--surface-page);border-radius:var(--radius-lg);padding:30px;display:flex;flex-direction:column;gap:14px;">
+          <span style="width:44px;height:44px;border-radius:var(--radius-md);background:rgba(2,25,56,0.08);color:var(--navy-900);display:flex;align-items:center;justify-content:center;font-size:20px;">◇</span>
+          <h3 style="margin:0;font-size:20px;font-weight:600;letter-spacing:-0.02em;">3D walkthrough preview</h3>
+          <p style="margin:0;font-size:15px;line-height:1.45;font-weight:500;color:var(--text-muted);text-wrap:pretty;">Flip any plan into 3D and walk the room before you book it. Share a link so clients see exactly what they're getting.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How it works -->
+  <section id="how" data-screen-label="How it works" style="max-width:1240px;width:100%;margin:0 auto;box-sizing:border-box;padding:72px 48px;display:flex;flex-direction:column;gap:48px;">
+    <div style="display:flex;flex-direction:column;gap:12px;max-width:560px;">
+      <span style="font-size:13px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--blue-600);">How it works</span>
+      <h2 style="margin:0;font-size:36px;font-weight:600;letter-spacing:-0.03em;line-height:1.1;">From blank room to booked event in four steps.</h2>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(4, 1fr);gap:24px;">
+      <sc-for list="{{ steps }}" as="step" hint-placeholder-count="4">
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <span style="width:36px;height:36px;border-radius:50%;background:var(--navy-900);color:white;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:600;">{{ step.n }}</span>
+          <h3 style="margin:0;font-size:18px;font-weight:600;letter-spacing:-0.02em;">{{ step.title }}</h3>
+          <p style="margin:0;font-size:14px;line-height:1.45;font-weight:500;color:var(--text-muted);text-wrap:pretty;">{{ step.body }}</p>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <!-- Audience split -->
+  <section id="audiences" data-screen-label="Audiences" style="background:var(--surface-card);">
+    <div style="max-width:1240px;margin:0 auto;padding:72px 48px;box-sizing:border-box;display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+      <div style="background:var(--navy-900);color:white;border-radius:var(--radius-lg);padding:40px;display:flex;flex-direction:column;gap:18px;position:relative;overflow:hidden;">
+        <div style="position:absolute;top:-80px;right:-60px;width:280px;height:280px;border-radius:50%;background:radial-gradient(circle, rgba(9,51,187,0.65), transparent 70%);"></div>
+        <span style="font-size:13px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#8fb4e8;position:relative;">For event planners</span>
+        <h3 style="margin:0;font-size:26px;font-weight:600;letter-spacing:-0.025em;line-height:1.15;position:relative;">Pitch layouts clients can walk through.</h3>
+        <ul style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:12px;position:relative;font-size:15px;font-weight:500;line-height:1.4;color:rgba(255,255,255,0.85);">
+          <li style="display:flex;gap:10px;"><span style="color:#8fb4e8;">—</span>Search and compare venues with accurate floor plans</li>
+          <li style="display:flex;gap:10px;"><span style="color:#8fb4e8;">—</span>Design seating, staging, and flow before you sign</li>
+          <li style="display:flex;gap:10px;"><span style="color:#8fb4e8;">—</span>Send clients a 3D walkthrough instead of a PDF</li>
+        </ul>
+      </div>
+      <div style="background:var(--surface-page);border-radius:var(--radius-lg);padding:40px;display:flex;flex-direction:column;gap:18px;">
+        <span style="font-size:13px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--blue-600);">For venue owners</span>
+        <h3 style="margin:0;font-size:26px;font-weight:600;letter-spacing:-0.025em;line-height:1.15;">List once. Get booked with confidence.</h3>
+        <ul style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:12px;font-size:15px;font-weight:500;line-height:1.4;color:var(--text-muted);">
+          <li style="display:flex;gap:10px;"><span style="color:var(--blue-600);">—</span>Digitize your spaces into reusable floor plans</li>
+          <li style="display:flex;gap:10px;"><span style="color: var(--blue-600);">—</span>Approve layouts against real capacity.</li>
+          <li style="display:flex;gap:10px;"><span style="color:var(--blue-600);">—</span>Fewer site visits, faster contracts, happier clients</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer CTA -->
+  <footer data-screen-label="Footer" style="background:var(--navy-900);color:white;">
+    <div style="max-width:1240px;margin:0 auto;padding:72px 48px 40px;box-sizing:border-box;display:flex;flex-direction:column;gap:48px;">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:20px;text-align:center;">
+        <h2 style="margin:0;font-size:40px;font-weight:600;letter-spacing:-0.03em;line-height:1.1;max-width:560px;text-wrap:pretty;">Ready to design smarter events?</h2>
+        <p style="margin:0;font-size:16px;font-weight:500;color:rgba(255,255,255,0.7);letter-spacing:-0.015em;">Join the waitlist and be first in when early access opens.</p>
+        <x-import component-from-global-scope="GreenRoomEventSpaceProDesignSystem_8baf0d.Button" size="lg" on-click="{{ scrollToWaitlist }}" hint-size="180px,54px">Join the waitlist</x-import>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;border-top:1px solid rgba(255,255,255,0.12);padding-top:24px;">
+        <img src="assets/mainLogoLight.svg" alt="EventSpacePro" style="height:26px;">
+        <span style="font-size:13px;color:rgba(255,255,255,0.5);font-weight:500;">© 2026 EventSpacePro. All rights reserved.</span>
+      </div>
+    </div>
+  </footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;showAnnouncementBadge&quot;: {&quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: true, &quot;tsType&quot;: &quot;boolean&quot;}}">
+class Component extends DCLogic {
+  state = { email: "", role: "planner", submitted: false, error: "", whatsappOn: false, phone: "" };
+  renderVals() {
+    const { email, role, submitted, error, whatsappOn, phone } = this.state;
+    const sel = { bg: "var(--blue-600)", color: "white", ring: "none" };
+    const unsel = { bg: "rgba(39,34,53,0.05)", color: "var(--ink-900)", ring: "none" };
+    const p = role === "planner" ? sel : unsel;
+    const v = role === "venue" ? sel : unsel;
+    return {
+      email, error, submitted, notSubmitted: !submitted, whatsappOn, phone,
+      waCheck: whatsappOn ? "✓" : "",
+      waBoxBg: whatsappOn ? "var(--blue-600)" : "var(--surface-input)",
+      waBoxRing: whatsappOn ? "none" : "inset 0 0 0 1px var(--surface-input-border)",
+      confirmCopy: whatsappOn ? "We'll email you — and message you on WhatsApp — the moment early access opens." : "We'll email you the moment early access opens.",
+      toggleWhatsapp: () => this.setState(s => ({ whatsappOn: !s.whatsappOn, error: "" })),
+      onPhone: (e) => this.setState({ phone: e.target.value, error: "" }),
+      showBadge: this.props.showAnnouncementBadge ?? true,
+      plannerBg: p.bg, plannerColor: p.color, plannerRing: p.ring,
+      venueBg: v.bg, venueColor: v.color, venueRing: v.ring,
+      pickPlanner: () => this.setState({ role: "planner" }),
+      pickVenue: () => this.setState({ role: "venue" }),
+      onEmail: (e) => this.setState({ email: e.target.value, error: "" }),
+      submit: () => {
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.state.email)) {
+          this.setState({ error: "Enter a valid email address." });
+          return;
+        }
+        if (this.state.whatsappOn && !/^\+?[\d\s().-]{7,}$/.test(this.state.phone)) {
+          this.setState({ error: "Enter a valid phone number for WhatsApp updates." });
+          return;
+        }
+        this.setState({ submitted: true });
+      },
+      scrollToWaitlist: () => {
+        const el = document.getElementById("waitlist");
+        if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 80, behavior: "smooth" });
+      },
+      steps: [
+        { n: "1", title: "Pick a space", body: "Choose from listed venues or upload your own room dimensions." },
+        { n: "2", title: "Describe the event", body: "Tell the AI assistant the guest count, style, and must-haves." },
+        { n: "3", title: "Refine in 2D", body: "Drag tables, stages, and assets until the plan is exactly right." },
+        { n: "4", title: "Walk it in 3D", body: "Preview the room, share it, and book with zero surprises." }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

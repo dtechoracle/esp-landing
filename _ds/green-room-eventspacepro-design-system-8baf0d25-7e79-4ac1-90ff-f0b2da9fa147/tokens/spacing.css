@@ -1,0 +1,15 @@
+:root{
+/* base unit observed in the source files is 6px, not 4/8px */
+--space-1:6px;
+--space-2:12px;
+--space-3:16px;
+--space-4:20px;
+--space-5:24px;
+--space-6:30px;
+--space-7:36px;
+--space-8:40px;
+--space-9:48px;
+--space-10:54px;
+--space-11:60px;
+--space-12:72px;
+}
