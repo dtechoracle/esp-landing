@@ -41,8 +41,6 @@ export default function Hero() {
         <div
           style={{
             background: "var(--surface-card)",
-            borderRadius: "var(--radius-lg)",
-            boxShadow: "var(--shadow-dropdown)",
             overflow: "hidden",
           }}
         >

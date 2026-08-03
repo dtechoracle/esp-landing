@@ -280,6 +280,7 @@ p {
     flex-direction: column !important;
   }
   .esp-waitlist-actions > input {
+    flex: none !important;
     width: 100% !important;
   }
   .esp-waitlist-actions > button {
