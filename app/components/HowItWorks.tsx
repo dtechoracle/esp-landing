@@ -11,13 +11,13 @@ const steps = [
   },
   {
     n: "3",
-    title: "Refine in 2D",
+    title: "Refine the blueprint",
     body: "Drag tables, stages, and assets until the plan is exactly right.",
   },
   {
     n: "4",
-    title: "Walk it in 3D",
-    body: "Preview the room, share it, and book with zero surprises.",
+    title: "Share and book",
+    body: "Send the plan to clients or vendors and lock in the booking.",
   },
 ];
 

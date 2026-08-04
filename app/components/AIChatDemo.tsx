@@ -8,7 +8,6 @@ type Message =
   | { id: number; sender: "typing" };
 
 const timeline: { delay: number; add?: Message; reset?: boolean }[] = [
-  // User picks a chip and types
   { delay: 600, add: { id: 1, sender: "user", text: "I'm planning a wedding reception for 150 guests in a ballroom with two pillars near the center." } },
   { delay: 1200, add: { id: 2, sender: "typing" } },
   {
@@ -16,7 +15,7 @@ const timeline: { delay: number; add?: Message; reset?: boolean }[] = [
     add: {
       id: 3,
       sender: "ai",
-      text: "Beautiful! I'll work around those pillars. What seating style do you prefer — banquet, theater, or cocktail?",
+      text: "Beautiful! I'll work around those pillars. What seating style do you prefer: banquet, theater, or cocktail?",
     },
   },
   { delay: 900, add: { id: 4, sender: "user", text: "Banquet with a dance floor in the center." } },
@@ -26,27 +25,27 @@ const timeline: { delay: number; add?: Message; reset?: boolean }[] = [
     add: {
       id: 6,
       sender: "ai",
-      text: "Done! 15 round tables of 10 arranged around a central dance floor, stage in the north corner, bar near the entrance. Want the 3D preview?",
+      text: "Done! 15 round tables of 10 arranged around a central dance floor, stage in the north corner, bar near the entrance. Want me to adjust anything?",
     },
   },
-  { delay: 700, add: { id: 7, sender: "user", text: "Yes, show me the walkthrough!" } },
+  { delay: 700, add: { id: 7, sender: "user", text: "Add a photo booth near the entrance." } },
   { delay: 1000, add: { id: 8, sender: "typing" } },
   {
     delay: 2400,
     add: {
       id: 9,
       sender: "ai",
-      text: "Here's your 3D walkthrough! Walk through the room to see the layout from every angle. You can also share this link with your client.",
+      text: "Photo booth placed near the entrance, 12x12 ft with backdrop and lighting space. Tables 1–3 shifted to make room. Capacity still at 150.",
     },
   },
-  { delay: 1200, add: { id: 10, sender: "user", text: "This is perfect! Can you also suggest lighting for the dance floor?" } },
+  { delay: 1200, add: { id: 10, sender: "user", text: "Can you suggest a catering layout for the buffet?" } },
   { delay: 1000, add: { id: 11, sender: "typing" } },
   {
     delay: 2200,
     add: {
       id: 12,
       sender: "ai",
-      text: "I'd recommend warm string lights overhead with LED uplights around the pillars to turn them into features. Want me to add those to the plan?",
+      text: "I've set up two buffet stations along the east wall with a flow path that keeps lines away from the dance floor. Vegetarian options marked on tables 7–12.",
     },
   },
   { delay: 3000, reset: true },

@@ -1,3 +1,4 @@
+import WaitlistForm from "./WaitlistForm";
 import AIChatDemo from "./AIChatDemo";
 
 export default function Hero() {
@@ -7,27 +8,6 @@ export default function Hero() {
       style={{ padding: "60px 24px 72px" }}
     >
       <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
-        <div
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 8,
-            background: "var(--surface-sunken)",
-            border: "1px solid var(--line-200)",
-            borderRadius: "var(--radius-pill)",
-            padding: "6px 14px",
-            fontSize: 12,
-            fontWeight: 600,
-            color: "var(--text-muted)",
-            letterSpacing: "0.04em",
-            textTransform: "uppercase",
-            width: "fit-content",
-          }}
-        >
-          <span style={{ fontSize: 14 }}>✦</span>
-          Next-Gen AI Venue Layout
-        </div>
-
         <h1
           style={{
             margin: 0,
@@ -37,7 +17,7 @@ export default function Hero() {
             letterSpacing: "-0.03em",
           }}
         >
-          Design, book, and visualize event spaces in one place.
+          Design stunning event blueprints, walk through immersive 3D spaces, and plan every detail before a single chair is placed.
         </h1>
         <p
           style={{
@@ -50,55 +30,10 @@ export default function Hero() {
             maxWidth: 480,
           }}
         >
-          EventSpacePro turns any venue into an editable 2D floor plan, a walkable
-          3D preview, and an AI assistant that lays out your event from a single
-          prompt.
+          EventSpacePro turns any venue into an editable floor plan, an AI-powered layout engine, and a shareable blueprint, all from a single prompt.
         </p>
 
-        <div style={{ display: "flex", gap: 12, marginTop: 8 }}>
-          <a
-            href="/login"
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              justifyContent: "center",
-              height: 48,
-              padding: "0 28px",
-              fontSize: 15,
-              fontWeight: 600,
-              letterSpacing: "-0.01em",
-              color: "var(--ink-900)",
-              background: "transparent",
-              border: "1px solid var(--line-300)",
-              borderRadius: "var(--radius-pill)",
-              cursor: "pointer",
-              textDecoration: "none",
-            }}
-          >
-            Login
-          </a>
-          <a
-            href="/signup"
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              justifyContent: "center",
-              height: 48,
-              padding: "0 28px",
-              fontSize: 15,
-              fontWeight: 600,
-              letterSpacing: "-0.01em",
-              color: "white",
-              background: "var(--navy-900)",
-              border: "none",
-              borderRadius: "var(--radius-pill)",
-              cursor: "pointer",
-              textDecoration: "none",
-            }}
-          >
-            Sign Up
-          </a>
-        </div>
+        <WaitlistForm />
       </div>
 
       <div>

@@ -56,7 +56,7 @@ export default function MockEditor() {
               textOverflow: "ellipsis",
             }}
           >
-            Rivera Wedding — Grand Hall
+            Rivera Wedding | Grand Hall
           </span>
           <span
             style={{

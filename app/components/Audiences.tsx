@@ -54,7 +54,7 @@ export default function Audiences() {
               position: "relative",
             }}
           >
-            Pitch layouts clients can walk through.
+            Pitch layouts clients can see and approve.
           </h3>
           <ul
             style={{
@@ -74,10 +74,10 @@ export default function Audiences() {
             {[
               "Search and compare venues with accurate floor plans",
               "Design seating, staging, and flow before you sign",
-              "Send clients a 3D walkthrough instead of a PDF",
+              "Send clients a polished blueprint instead of a PDF",
             ].map((item) => (
               <li key={item} style={{ display: "flex", gap: 10 }}>
-                <span style={{ color: "#8fb4e8" }}>—</span>
+                <span style={{ color: "#8fb4e8" }}>›</span>
                 {item}
               </li>
             ))}
@@ -134,11 +134,11 @@ export default function Audiences() {
           >
             {[
               "Digitize your spaces into reusable floor plans",
-              "Approve layouts against real capacity.",
+              "Approve layouts against real capacity and compliance rules",
               "Fewer site visits, faster contracts, happier clients",
             ].map((item) => (
               <li key={item} style={{ display: "flex", gap: 10 }}>
-                <span style={{ color: "var(--blue-600)" }}>—</span>
+                <span style={{ color: "var(--blue-600)" }}>›</span>
                 {item}
               </li>
             ))}

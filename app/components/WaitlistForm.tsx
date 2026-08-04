@@ -46,7 +46,7 @@ export default function WaitlistForm() {
   const emailRef = useRef<HTMLInputElement>(null);
 
   const confirmCopy = whatsappOn
-    ? "We'll email you — and add you to our WhatsApp channel — the moment early access opens."
+    ? "We'll email you and add you to our WhatsApp channel the moment early access opens."
     : "We'll email you the moment early access opens.";
 
   function reset() {
@@ -91,7 +91,7 @@ export default function WaitlistForm() {
           type: "success",
           message:
             result.status === 409
-              ? "That email is already on the list — we'll be in touch soon!"
+              ? "That email is already on the list, we'll be in touch soon!"
               : confirmCopy,
         });
         return;
