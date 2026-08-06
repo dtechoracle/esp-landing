@@ -8,13 +8,6 @@ import { waitlistSignup } from "@/lib/backend-client";
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PHONE_RE = /^\+?[\d\s().-]{7,}$/;
 
-const sel = { bg: "var(--blue-600)", color: "white", ring: "none" };
-const unsel = {
-  bg: "rgba(39,34,53,0.05)",
-  color: "var(--ink-900)",
-  ring: "none",
-};
-
 const inputStyle: React.CSSProperties = {
   height: 46,
   border: "none",
@@ -35,7 +28,7 @@ export default function WaitlistForm() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
-  const [role, setRole] = useState<"planner" | "venue_owner">("planner");
+  const [role, setRole] = useState("Event planner");
   const [whatsappOn, setWhatsappOn] = useState(false);
   const [status, setStatus] = useState<"idle" | "submitting">("idle");
   const [error, setError] = useState("");
@@ -142,46 +135,16 @@ export default function WaitlistForm() {
         style={{ ...inputStyle, width: "100%" }}
       />
 
-      <div style={{ display: "flex", gap: 10 }}>
-        {(
-          [
-            ["planner", "Event planner"],
-            ["venue_owner", "Venue owner"],
-          ] as const
-        ).map(([key, label]) => {
-          const active = role === key;
-          const s = active ? sel : unsel;
-          return (
-            <button
-              key={key}
-              type="button"
-              onClick={() => setRole(key)}
-              aria-pressed={active}
-              style={{
-                flex: 1,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: 8,
-                height: 44,
-                borderRadius: "var(--radius-md)",
-                cursor: "pointer",
-                fontSize: 14,
-                fontWeight: 600,
-                letterSpacing: "-0.015em",
-                border: "none",
-                fontFamily: "var(--font-sans)",
-                transition: "all 150ms ease",
-                background: s.bg,
-                color: s.color,
-                boxShadow: s.ring,
-              }}
-            >
-              {label}
-            </button>
-          );
-        })}
-      </div>
+      <select
+        value={role}
+        onChange={(e) => setRole(e.target.value)}
+        style={{ ...inputStyle, width: "100%", cursor: "pointer" }}
+      >
+        <option value="event_planner">Event planner</option>
+        <option value="decorator">Decorator</option>
+        <option value="venue_staff">Venue / Venue staff</option>
+        <option value="other_creative_pro">Other Creative Pro</option>
+      </select>
 
       <div className="esp-waitlist-actions" style={{ display: "flex", gap: 10 }}>
         <input
@@ -243,7 +206,7 @@ export default function WaitlistForm() {
         >
           {whatsappOn ? "✓" : ""}
         </span>
-        Add me to the WhatsApp channel for updates, tips and special offers
+        Add me to the WhatsApp community for update tips and special offers
       </label>
 
       {whatsappOn && (
