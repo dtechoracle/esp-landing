@@ -76,33 +76,51 @@ export default function AIChatDemo() {
       {/* Header */}
       <div
         style={{
-          padding: "20px 24px 16px",
-          borderBottom: "1px solid var(--line-200)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          padding: "20px 24px 0",
         }}
       >
+        <h3
+          style={{
+            margin: 0,
+            fontSize: 22,
+            fontWeight: 700,
+            letterSpacing: "-0.03em",
+            color: "var(--ink-900)",
+          }}
+        >
+          Hello, User.
+        </h3>
         <span
           style={{
             fontSize: 12,
-            fontWeight: 700,
-            letterSpacing: "0.1em",
-            textTransform: "uppercase",
-            color: "var(--blue-600)",
+            fontWeight: 500,
+            color: "var(--text-muted)",
+            padding: "6px 12px",
+            border: "1px solid var(--line-200)",
+            borderRadius: "var(--radius-pill)",
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            gap: 6,
           }}
         >
-          AI Assistant
+          <span style={{ fontSize: 11 }}>↻</span> New Chat
         </span>
       </div>
 
-      {/* Messages */}
+      {/* Animated conversation */}
       <div
         style={{
           flex: 1,
           overflow: "hidden",
-          padding: "16px 20px",
+          padding: "16px 24px 12px",
           display: "flex",
           flexDirection: "column",
           justifyContent: "flex-end",
-          gap: 12,
+          gap: 10,
         }}
       >
         {messages.map((m) => {
@@ -111,20 +129,33 @@ export default function AIChatDemo() {
               <div
                 key={m.id}
                 className="esp-msg-in"
-                style={{
-                  display: "flex",
-                  gap: 8,
-                  alignItems: "flex-end",
-                }}
+                style={{ display: "flex", gap: 8, alignItems: "flex-end" }}
               >
+                <span
+                  style={{
+                    width: 28,
+                    height: 28,
+                    flexShrink: 0,
+                    borderRadius: "50%",
+                    background: "var(--navy-900)",
+                    color: "white",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: 13,
+                  }}
+                >
+                  ✦
+                </span>
                 <div
                   style={{
                     background: "var(--surface-sunken)",
                     border: "1px solid var(--line-200)",
                     borderRadius: "4px 14px 14px 14px",
-                    padding: "12px 16px",
+                    padding: "12px 14px",
                     display: "flex",
                     gap: 5,
+                    color: "var(--ink-900)",
                   }}
                 >
                   <span className="esp-typing-dot" />
@@ -142,20 +173,35 @@ export default function AIChatDemo() {
               className="esp-msg-in"
               style={{
                 display: "flex",
-                justifyContent: isUser ? "flex-end" : "flex-start",
+                flexDirection: "column",
+                gap: 4,
+                alignItems: isUser ? "flex-end" : "flex-start",
+                maxWidth: "100%",
               }}
             >
+              <span
+                style={{
+                  fontSize: 11,
+                  fontWeight: 700,
+                  letterSpacing: "-0.01em",
+                  color: isUser ? "var(--blue-600)" : "var(--text-muted)",
+                  padding: "0 4px",
+                }}
+              >
+                {isUser ? "User" : "EventSpacePro AI"}
+              </span>
               <div
                 style={{
                   maxWidth: "85%",
-                  background: isUser ? "var(--navy-900)" : "var(--surface-sunken)",
+                  background: isUser ? "var(--blue-600)" : "var(--surface-sunken)",
                   border: isUser ? "none" : "1px solid var(--line-200)",
                   color: isUser ? "white" : "var(--ink-900)",
                   borderRadius: isUser ? "14px 4px 14px 14px" : "4px 14px 14px 14px",
-                  padding: "12px 16px",
-                  fontSize: 14,
+                  padding: "12px 14px",
+                  fontSize: 13,
                   fontWeight: 500,
                   lineHeight: 1.45,
+                  letterSpacing: "-0.01em",
                 }}
               >
                 {m.text}
@@ -165,10 +211,10 @@ export default function AIChatDemo() {
         })}
       </div>
 
-      {/* Input bar */}
+      {/* Search input bar */}
       <div
         style={{
-          padding: "12px 20px 20px",
+          padding: "0 24px 18px",
         }}
       >
         <div
@@ -178,31 +224,53 @@ export default function AIChatDemo() {
             gap: 10,
             height: 48,
             padding: "0 16px",
-            border: "1px solid var(--line-200)",
+            border: "2px solid var(--blue-600)",
             borderRadius: "var(--radius-pill)",
             background: "var(--surface-0)",
+            boxSizing: "border-box",
           }}
         >
           <span
             style={{
-              width: 20,
-              height: 20,
-              color: "var(--blue-600)",
+              width: 28,
+              height: 28,
+              borderRadius: "50%",
+              background: "var(--surface-sunken)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              color: "var(--text-muted)",
               flexShrink: 0,
             }}
           >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
             </svg>
           </span>
           <span
             style={{
               flex: 1,
               fontSize: 14,
+              fontWeight: 500,
               color: "var(--text-faint)",
+              letterSpacing: "-0.01em",
             }}
           >
-            Build a banquet layout for...
+            What do you need help with?
+          </span>
+          <span
+            style={{
+              fontSize: 11,
+              fontWeight: 600,
+              color: "var(--text-muted)",
+              padding: "4px 8px",
+              border: "1px solid var(--line-200)",
+              borderRadius: "var(--radius-sm)",
+              flexShrink: 0,
+            }}
+          >
+            Ctrl + K
           </span>
         </div>
       </div>
