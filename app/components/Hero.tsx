@@ -17,7 +17,7 @@ export default function Hero() {
             letterSpacing: "-0.03em",
           }}
         >
-          Design stunning event blueprints, walk through immersive 3D spaces, and plan every detail before a single chair is placed.
+          Design stunning event blueprints, and plan every detail before a single chair is placed.
         </h1>
         <p
           style={{

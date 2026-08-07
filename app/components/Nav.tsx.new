@@ -1,0 +1,54 @@
+"use client";
+
+import Button from "./Button";
+
+const links = [
+  { href: "#features", label: "Features" },
+  { href: "#how", label: "How it works" },
+  { href: "#audiences", label: "Who it's for" },
+];
+
+function scrollToWaitlist() {
+  const el = document.getElementById("waitlist");
+  if (el) {
+    el.scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+}
+
+export default function Nav() {
+  return (
+    <header
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        padding: "20px 48px",
+        maxWidth: 1240,
+        width: "100%",
+        margin: "0 auto",
+        boxSizing: "border-box",
+      }}
+    >
+      <img src="/assets/mainLogo.svg" alt="EventSpacePro" style={{ height: 34 }} />
+      <nav
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 30,
+          fontWeight: 500,
+          fontSize: 15,
+          letterSpacing: "-0.015em",
+        }}
+      >
+        {links.map((link) => (
+          <a key={link.href} href={link.href} style={{ color: "var(--ink-900)" }}>
+            {link.label}
+          </a>
+        ))}
+        <Button size="sm" onClick={scrollToWaitlist}>
+          Join the waitlist
+        </Button>
+      </nav>
+    </header>
+  );
+}

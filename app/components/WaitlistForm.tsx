@@ -2,7 +2,6 @@
 
 import { useRef, useState } from "react";
 import Button from "./Button";
-import Modal from "./Modal";
 import { waitlistSignup } from "@/lib/backend-client";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -32,25 +31,7 @@ export default function WaitlistForm() {
   const [whatsappOn, setWhatsappOn] = useState(false);
   const [status, setStatus] = useState<"idle" | "submitting">("idle");
   const [error, setError] = useState("");
-  const [modal, setModal] = useState<{
-    type: "success" | "error";
-    message?: string;
-  } | null>(null);
   const emailRef = useRef<HTMLInputElement>(null);
-
-  const confirmCopy = whatsappOn
-    ? "We'll email you and add you to our WhatsApp channel the moment early access opens."
-    : "We'll email you the moment early access opens.";
-
-  function reset() {
-    setModal(null);
-    setStatus("idle");
-    setError("");
-    setEmail("");
-    setName("");
-    setPhone("");
-    setWhatsappOn(false);
-  }
 
   async function submit() {
     setError("");
@@ -80,29 +61,15 @@ export default function WaitlistForm() {
 
       if (result.ok || result.status === 409) {
         setStatus("idle");
-        setModal({
-          type: "success",
-          message:
-            result.status === 409
-              ? "That email is already on the list, we'll be in touch soon!"
-              : confirmCopy,
-        });
+        setError("");
         return;
       }
 
       setStatus("idle");
-      setModal({
-        type: "error",
-        message:
-          result.message ||
-          "We couldn't add you to the waitlist. Please try again in a moment.",
-      });
+      setError(result.message || "We couldn't add you to the waitlist. Please try again in a moment.");
     } catch {
       setStatus("idle");
-      setModal({
-        type: "error",
-        message: "Network error. Please check your connection and try again.",
-      });
+      setError("Network error. Please check your connection and try again.");
     }
   }
 
@@ -112,41 +79,45 @@ export default function WaitlistForm() {
       style={{
         background: "var(--surface-card)",
         borderRadius: "var(--radius-lg)",
-        boxShadow: "var(--shadow-card)",
         padding: 24,
         display: "flex",
         flexDirection: "column",
         gap: 16,
         maxWidth: 480,
         boxSizing: "border-box",
+        border: "1px solid var(--line-200)",
+        boxShadow: "var(--shadow-card)",
       }}
     >
-      <span style={{ fontSize: 16, fontWeight: 600, letterSpacing: "-0.015em" }}>
-        Get early access
-      </span>
+      <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+        <span style={{ fontSize: 16, fontWeight: 700, letterSpacing: "-0.015em" }}>
+          Get early access
+        </span>
+        <span style={{ fontSize: 13, fontWeight: 500, color: "var(--text-muted)" }}>Your name</span>
+        <input
+          type="text"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && submit()}
+          placeholder="Your name"
+          aria-label="Your name"
+          style={{ ...inputStyle, width: "100%" }}
+        />
+        <span style={{ fontSize: 13, fontWeight: 500, color: "var(--text-muted)" }}>I&apos;m a…</span>
+        <select
+          value={role}
+          onChange={(e) => setRole(e.target.value)}
+          style={{ ...inputStyle, width: "100%", cursor: "pointer" }}
+        >
+          <option value="event_planner">Event planner</option>
+          <option value="decorator">Decorator</option>
+          <option value="venue_staff">Venue / Venue staff</option>
+          <option value="other_creative_pro">Other creative pro</option>
+        </select>
+      </div>
 
-      <input
-        type="text"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        onKeyDown={(e) => e.key === "Enter" && submit()}
-        placeholder="Your name"
-        aria-label="Your name"
-        style={{ ...inputStyle, width: "100%" }}
-      />
-
-      <select
-        value={role}
-        onChange={(e) => setRole(e.target.value)}
-        style={{ ...inputStyle, width: "100%", cursor: "pointer" }}
-      >
-        <option value="event_planner">Event planner</option>
-        <option value="decorator">Decorator</option>
-        <option value="venue_staff">Venue / Venue staff</option>
-        <option value="other_creative_pro">Other Creative Pro</option>
-      </select>
-
-      <div className="esp-waitlist-actions" style={{ display: "flex", gap: 10 }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+        <span style={{ fontSize: 13, fontWeight: 500, color: "var(--text-muted)" }}>Work email</span>
         <input
           ref={emailRef}
           type="email"
@@ -157,12 +128,9 @@ export default function WaitlistForm() {
             setError("");
           }}
           onKeyDown={(e) => e.key === "Enter" && submit()}
-          style={{ ...inputStyle, flex: 1, minWidth: 0 }}
-          aria-label="Email address"
+          style={{ ...inputStyle, width: "100%" }}
+          aria-label="Work email"
         />
-        <Button size="md" onClick={submit} disabled={status === "submitting"}>
-          {status === "submitting" ? "Joining…" : "Join"}
-        </Button>
       </div>
 
       <label
@@ -206,7 +174,7 @@ export default function WaitlistForm() {
         >
           {whatsappOn ? "✓" : ""}
         </span>
-        Add me to the WhatsApp community for update tips and special offers
+        Add me to the WhatsApp community and channel for updates, tips and special offers
       </label>
 
       {whatsappOn && (
@@ -220,7 +188,7 @@ export default function WaitlistForm() {
           }}
           onKeyDown={(e) => e.key === "Enter" && submit()}
           style={{ ...inputStyle, width: "100%" }}
-          aria-label="WhatsApp phone number"
+          aria-label="WhatsApp number"
         />
       )}
 
@@ -230,95 +198,14 @@ export default function WaitlistForm() {
         </span>
       )}
 
+      <Button size="lg" onClick={submit} disabled={status === "submitting"} style={{ width: "100%" }}>
+        {status === "submitting" ? "Joining…" : "Join the waitlist"}
+      </Button>
+
       <span style={{ fontSize: 12, color: "var(--text-faint)", fontWeight: 400 }}>
         No spam. One email when your invite is ready.
       </span>
 
-      {/* Success modal */}
-      <Modal
-        open={modal?.type === "success"}
-        onClose={reset}
-        labelledBy="waitlist-success"
-      >
-        <div style={{ display: "flex", flexDirection: "column", gap: 16, alignItems: "flex-start" }}>
-          <span
-            style={{
-              width: 56,
-              height: 56,
-              borderRadius: "50%",
-              background: "rgba(16,185,129,0.12)",
-              color: "var(--success-500)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: 28,
-            }}
-          >
-            ✓
-          </span>
-          <h2
-            id="waitlist-success"
-            style={{
-              margin: 0,
-              fontSize: 24,
-              fontWeight: 600,
-              letterSpacing: "-0.02em",
-              textAlign: "left",
-            }}
-          >
-            You&apos;re on the list!
-          </h2>
-          <p style={{ margin: 0, fontSize: 15, color: "var(--text-muted)", fontWeight: 500, lineHeight: 1.45 }}>
-            {modal?.message || confirmCopy}
-          </p>
-          <Button size="md" onClick={reset} style={{ width: "100%" }}>
-            Done
-          </Button>
-        </div>
-      </Modal>
-
-      {/* Error modal */}
-      <Modal
-        open={modal?.type === "error"}
-        onClose={() => setModal(null)}
-        labelledBy="waitlist-error"
-      >
-        <div style={{ display: "flex", flexDirection: "column", gap: 16, alignItems: "flex-start" }}>
-          <span
-            style={{
-              width: 56,
-              height: 56,
-              borderRadius: "50%",
-              background: "rgba(239,68,68,0.12)",
-              color: "var(--error-500)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: 28,
-            }}
-          >
-            ✕
-          </span>
-          <h2
-            id="waitlist-error"
-            style={{ margin: 0, fontSize: 24, fontWeight: 600, letterSpacing: "-0.02em", textAlign: "left" }}
-          >
-            Something went wrong
-          </h2>
-          <p style={{ margin: 0, fontSize: 15, color: "var(--text-muted)", fontWeight: 500, lineHeight: 1.45 }}>
-            {modal?.message ||
-              "We couldn't add you to the waitlist. Please try again in a moment."}
-          </p>
-          <div style={{ display: "flex", gap: 10 }}>
-            <Button variant="secondary" onClick={() => setModal(null)}>
-              Try again
-            </Button>
-            <Button variant="ghost" onClick={reset}>
-              Clear form
-            </Button>
-          </div>
-        </div>
-      </Modal>
     </div>
   );
 }

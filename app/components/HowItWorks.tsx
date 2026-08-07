@@ -11,13 +11,13 @@ const steps = [
   },
   {
     n: "3",
-    title: "Refine the blueprint",
+    title: "Refine in 2D",
     body: "Drag tables, stages, and assets until the plan is exactly right.",
   },
   {
     n: "4",
-    title: "Share and book",
-    body: "Send the plan to clients or vendors and lock in the booking.",
+    title: "Share and lock in",
+    body: "Send the venue a live plan link with capacity locked in, no surprises on the day.",
   },
 ];
 
@@ -54,7 +54,7 @@ export default function HowItWorks() {
               lineHeight: 1.1,
             }}
           >
-            From blank room to booked event in four steps.
+            From blank room to a finished floor plan in four steps.
           </h2>
         </div>
 

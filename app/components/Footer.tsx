@@ -49,7 +49,7 @@ export default function Footer() {
               letterSpacing: "-0.015em",
             }}
           >
-            Join the waitlist and be first in when early access opens.
+            Join the waitlist for the 2D editor and AI assistant and get 3D the day it ships.
           </p>
           <Button size="lg" onClick={scrollToWaitlist}>
             Join the waitlist
@@ -79,7 +79,7 @@ export default function Footer() {
               fontWeight: 500,
             }}
           >
-            © {new Date().getFullYear()} EventSpacePro. All rights reserved.
+            © 2026 EventSpacePro. All rights reserved.
           </span>
         </div>
       </div>

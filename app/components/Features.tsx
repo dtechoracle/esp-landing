@@ -1,16 +1,18 @@
+import workspaceImage from "../../assets/workspace-2d-editor.png";
+
 const features = [
   {
     icon: (
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6" />
-        <line x1="8" y1="2" x2="8" y2="18" />
-        <line x1="16" y1="6" x2="16" y2="22" />
+        <rect x="3" y="4" width="18" height="16" rx="2" />
+        <path d="M3 9h18" />
+        <path d="M9 13h6" />
       </svg>
     ),
     iconBg: "rgba(0,86,169,0.1)",
     iconColor: "var(--blue-600)",
-    title: "Event Blueprints",
-    body: "Design detailed floor plans and layouts for any type of event with precision drag-and-drop tools.",
+    title: "2D floor-plan editor",
+    body: "Drag-and-drop walls, tables, stages, and assets on a precise grid. Real dimensions, real capacity counts, no CAD required.",
   },
   {
     icon: (
@@ -22,50 +24,8 @@ const features = [
     ),
     iconBg: "rgba(78,28,216,0.1)",
     iconColor: "var(--purple-600)",
-    title: "Smart Templates",
-    body: "Kick-start your event with intelligent templates tailored for weddings, conferences, galas, and more.",
-  },
-  {
-    icon: (
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-        <circle cx="9" cy="7" r="4" />
-        <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-      </svg>
-    ),
-    iconBg: "rgba(2,25,56,0.08)",
-    iconColor: "var(--navy-900)",
-    title: "Real-Time Collaboration",
-    body: "Invite your team, vendors, and clients to co-plan events live, all from one dashboard.",
-  },
-  {
-    icon: (
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
-        <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
-        <line x1="12" y1="22.08" x2="12" y2="12" />
-      </svg>
-    ),
-    iconBg: "rgba(0,86,169,0.1)",
-    iconColor: "var(--blue-600)",
-    title: "3D Visualization",
-    body: "Walk through your event space in immersive 3D before the first guest ever arrives.",
-  },
-  {
-    icon: (
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <circle cx="13.5" cy="6.5" r="2.5" />
-        <circle cx="17.5" cy="10.5" r="2.5" />
-        <circle cx="8.5" cy="7.5" r="2.5" />
-        <circle cx="6.5" cy="12.5" r="2.5" />
-        <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z" />
-      </svg>
-    ),
-    iconBg: "rgba(78,28,216,0.1)",
-    iconColor: "var(--purple-600)",
-    title: "Decor Simulation",
-    body: "Place virtual decor, lighting, and furniture to see how everything looks before you commit.",
+    title: "AI layout assistant",
+    body: "Describe the event, \"250 guests, theater seating, two bars\", and get a compliant layout in seconds. Then tweak it by hand.",
   },
   {
     icon: (
@@ -75,9 +35,9 @@ const features = [
       </svg>
     ),
     iconBg: "rgba(2,25,56,0.08)",
-    iconColor: "var(--navy-900)",
-    title: "Compliance Integration",
-    body: "Fire safety regulations, capacity limits, accessibility requirements, and venue-specific constraints with built-in AI powered insights.",
+    iconColor: "var(--gray-500)",
+    title: "3D walkthrough preview",
+    body: "In build now: flip any plan into 3D and walk the room before load-in day. Every plan you draw today carries straight over.",
   },
 ];
 
@@ -85,9 +45,11 @@ export default function Features() {
   return (
     <section id="features" style={{ background: "var(--surface-card)" }}>
       <div
-        className="container esp-section"
         style={{
-          padding: "72px 24px",
+          maxWidth: 1240,
+          margin: "0 auto",
+          padding: "72px 48px",
+          boxSizing: "border-box",
           display: "flex",
           flexDirection: "column",
           gap: 48,
@@ -103,7 +65,7 @@ export default function Features() {
               color: "var(--blue-600)",
             }}
           >
-            What&apos;s Coming
+            Features
           </span>
           <h2
             style={{
@@ -114,14 +76,14 @@ export default function Features() {
               lineHeight: 1.1,
             }}
           >
-            Everything you need to build the perfect event.
+            Shipping at launch... plus what comes next.
           </h2>
         </div>
 
-        <div className="grid-features">
-          {features.map((f) => (
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 24 }}>
+          {features.map((feature) => (
             <div
-              key={f.title}
+              key={feature.title}
               style={{
                 background: "var(--surface-page)",
                 borderRadius: "var(--radius-lg)",
@@ -136,25 +98,37 @@ export default function Features() {
                   width: 44,
                   height: 44,
                   borderRadius: "var(--radius-md)",
-                  background: f.iconBg,
-                  color: f.iconColor,
+                  background: feature.iconBg,
+                  color: feature.iconColor,
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                 }}
               >
-                {f.icon}
+                {feature.icon}
               </span>
-              <h3
-                style={{
-                  margin: 0,
-                  fontSize: 20,
-                  fontWeight: 600,
-                  letterSpacing: "-0.02em",
-                }}
-              >
-                {f.title}
-              </h3>
+              <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+                <h3
+                  style={{
+                    margin: 0,
+                    fontSize: 20,
+                    fontWeight: 600,
+                    letterSpacing: "-0.02em",
+                    color: feature.title === "3D walkthrough preview" ? "var(--text-muted)" : "var(--ink-900)",
+                  }}
+                >
+                  {feature.title}
+                </h3>
+                {feature.title === "2D floor-plan editor" && (
+                  <span style={{ fontSize: 12, fontWeight: 600, color: "var(--success-500)", textTransform: "uppercase", letterSpacing: "0.08em" }}>At launch</span>
+                )}
+                {feature.title === "AI layout assistant" && (
+                  <span style={{ fontSize: 12, fontWeight: 600, color: "var(--success-500)", textTransform: "uppercase", letterSpacing: "0.08em" }}>At launch</span>
+                )}
+                {feature.title === "3D walkthrough preview" && (
+                  <span style={{ fontSize: 12, fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.08em" }}>Early 2027</span>
+                )}
+              </div>
               <p
                 style={{
                   margin: 0,
@@ -162,12 +136,55 @@ export default function Features() {
                   lineHeight: 1.45,
                   fontWeight: 500,
                   color: "var(--text-muted)",
+                  textWrap: "pretty",
                 }}
               >
-                {f.body}
+                {feature.body}
               </p>
             </div>
           ))}
+        </div>
+
+        <figure style={{ margin: 0, display: "flex", flexDirection: "column", gap: 12 }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 16px", background: "var(--surface-sunken-2)" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
+              <span style={{ width: 10, height: 10, borderRadius: "50%", background: "var(--line-300)" }} />
+              <span style={{ width: 10, height: 10, borderRadius: "50%", background: "var(--line-300)" }} />
+              <span style={{ width: 10, height: 10, borderRadius: "50%", background: "var(--line-300)" }} />
+            </div>
+            <span style={{ fontSize: 12, fontWeight: 600, color: "var(--text-muted)", letterSpacing: "-0.015em", minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", padding: "0 12px" }}>
+              Tomi &amp; Chioma Wedding — Habour Point Event Centre
+            </span>
+            <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0, whiteSpace: "nowrap" }}>
+              <span style={{ fontSize: 12, fontWeight: 600, color: "var(--blue-600)", letterSpacing: "-0.015em" }}>2D editor</span>
+              <span style={{ fontSize: 12, fontWeight: 600, color: "var(--text-muted)", letterSpacing: "-0.015em" }}>3D · 2027</span>
+            </div>
+          </div>
+          <img src={workspaceImage.src} alt="The EventSpacePro 2D editor: an 84-table banquet layout in a 64.95 × 25.18 m hall, with the elements panel, venue assets, and properties sidebar" style={{ width: "100%", height: "auto", display: "block", borderRadius: "var(--radius-md)", boxShadow: "var(--shadow-dropdown)" }} />
+          <figcaption style={{ fontSize: 13, fontWeight: 500, color: "var(--text-muted)", letterSpacing: "-0.015em" }}>
+            84 numbered tables across a 64.95 × 25.18 m hall drawn to real dimensions and numbered automatically.
+          </figcaption>
+        </figure>
+
+        <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <span style={{ fontSize: 13, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--blue-600)" }}>Also included at launch</span>
+            <span style={{ flex: 1, height: 1, background: "color-mix(in oklch, var(--blue-600) 18%, transparent)" }} />
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 20 }}>
+            {[
+              { title: "Asset library", body: "Tables, chairs, stages, bars, and props drag-ready and sized to real dimensions." },
+              { title: "Real-time collaboration", body: "Plan alongside your team and the venue in one file. Changes appear as they happen." },
+              { title: "Venue templates", body: "Edit and save any layout as a reusable template e.g marquees, outdoor.... and start the next event from it." },
+              { title: "Preloaded venues", body: "Listed spaces arrive with accurate plans and locations already integrated in." },
+              { title: "Table numbering", body: "Auto-number tables and seats, then export the list for place cards and charts." },
+            ].map((extra) => (
+              <div key={extra.title} style={{ background: "color-mix(in oklch, var(--blue-600) 8%, white)", borderRadius: "var(--radius-md)", padding: 20, display: "flex", flexDirection: "column", gap: 8 }}>
+                <h4 style={{ margin: 0, fontSize: 16, fontWeight: 600, letterSpacing: "-0.02em" }}>{extra.title}</h4>
+                <p style={{ margin: 0, fontSize: 14, lineHeight: 1.4, fontWeight: 500, color: "var(--text-muted)", textWrap: "pretty" }}>{extra.body}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </section>
