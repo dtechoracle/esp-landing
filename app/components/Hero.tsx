@@ -3,10 +3,7 @@ import AIChatDemo from "./AIChatDemo";
 
 export default function Hero() {
   return (
-    <section
-      className="container grid-hero esp-section"
-      style={{ padding: "60px 24px 72px" }}
-    >
+    <section className="container grid-hero esp-section" style={{ padding: "60px 24px 72px" }}>
       <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
         <h1
           style={{
@@ -17,7 +14,8 @@ export default function Hero() {
             letterSpacing: "-0.03em",
           }}
         >
-          Design stunning event blueprints, and plan every detail before a single chair is placed.
+          Design your event floor plan in 2D.
+Let AI do the first draft.
         </h1>
         <p
           style={{
@@ -30,7 +28,7 @@ export default function Hero() {
             maxWidth: 480,
           }}
         >
-          EventSpacePro turns any venue into an editable floor plan, an AI-powered layout engine, and a shareable blueprint, all from a single prompt.
+          EventSpacePro turns any venue into an editable 2D floor plan with an AI assistant that lays out your event from a single prompt. 
         </p>
 
         <WaitlistForm />

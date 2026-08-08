@@ -44,17 +44,7 @@ const features = [
 export default function Features() {
   return (
     <section id="features" style={{ background: "var(--surface-card)" }}>
-      <div
-        style={{
-          maxWidth: 1240,
-          margin: "0 auto",
-          padding: "72px 48px",
-          boxSizing: "border-box",
-          display: "flex",
-          flexDirection: "column",
-          gap: 48,
-        }}
-      >
+      <div className="container esp-section" style={{ padding: "72px 24px", display: "flex", flexDirection: "column", gap: 48 }}>
         <div style={{ display: "flex", flexDirection: "column", gap: 12, maxWidth: 560 }}>
           <span
             style={{
@@ -80,7 +70,7 @@ export default function Features() {
           </h2>
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 24 }}>
+        <div className="grid-features">
           {features.map((feature) => (
             <div
               key={feature.title}

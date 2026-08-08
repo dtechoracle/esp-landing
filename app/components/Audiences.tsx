@@ -40,17 +40,7 @@ export default function Audiences() {
 
   return (
     <section id="audiences" style={{ background: "var(--surface-card)" }}>
-      <div
-        style={{
-          maxWidth: 1240,
-          margin: "0 auto",
-          padding: "72px 48px",
-          boxSizing: "border-box",
-          display: "grid",
-          gridTemplateColumns: "1fr 1fr",
-          gap: 24,
-        }}
-      >
+      <div className="container grid-audience esp-section" style={{ padding: "72px 24px" }}>
         {audienceCards.map((audience) => (
           <div
             key={audience.eyebrow}
