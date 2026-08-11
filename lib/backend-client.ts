@@ -51,7 +51,7 @@ export async function waitlistSignup(input: {
 }): Promise<{ ok: boolean; status: number; message?: string }> {
   let res: Response;
   try {
-    res = await fetch(`${backendBaseUrl()}/api/admin/waitlist`, {
+    res = await fetch(`${backendBaseUrl()}/api/waitlist`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(input),

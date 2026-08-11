@@ -22,9 +22,19 @@ export const AVAILABLE_VARS = [
 ] as const;
 
 function roleLabel(role?: string): string {
-  if (role === "venue_owner") return "Venue owner";
-  if (role === "planner") return "Event planner";
-  return role || "";
+  switch (role) {
+    case "event_planner":
+    case "planner":
+      return "Event planner";
+    case "decorator":
+      return "Decorator";
+    case "venue_staff":
+      return "Venue / Venue staff";
+    case "other_creative_pro":
+      return "Other Creative Pro";
+    default:
+      return role || "";
+  }
 }
 
 export function buildTemplateVars(sub: TemplateRecipient): TemplateVars {

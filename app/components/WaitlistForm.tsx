@@ -60,6 +60,9 @@ export default function WaitlistForm() {
       });
 
       if (result.ok || result.status === 409) {
+        if (whatsappOn) {
+          window.open("https://whatsapp.com/channel/0029VbDahNlLdQej7Bpe5L3t", "_blank");
+        }
         setStatus("idle");
         setError("");
         return;

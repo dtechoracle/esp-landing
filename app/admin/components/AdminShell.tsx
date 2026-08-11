@@ -188,7 +188,7 @@ export default function AdminShell({ children }: { children: ReactNode }) {
             <span style={{ fontSize: 16 }}>☰</span>
           </button>
           <span style={{ fontSize: 15, fontWeight: 600 }}>EventSpacePro Admin</span>
-          <span style={{ fontSize: 13, color: "var(--text-muted)" }}>
+          <span style={{ fontSize: 13, color: "var(--text-muted)" }} suppressHydrationWarning>
             {new Date().toLocaleDateString()}
           </span>
         </header>

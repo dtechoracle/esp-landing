@@ -5,6 +5,7 @@ import AdminShell from "../components/AdminShell";
 import Modal from "../../components/Modal";
 import { useAdminAuth } from "@/lib/useAdminAuth";
 import {
+  backendBaseUrl,
   fetchWaitlist,
   sendBroadcastEmail,
   type WaitlistEntry,
@@ -13,18 +14,36 @@ import { buildTemplateVars, renderTemplate } from "@/lib/template";
 import VariableField, { type PreviewRecipient } from "./VariableField";
 import RichEditor from "./RichEditor";
 
-type Campaign = {
-  id: number;
+type BroadcastCampaign = {
+  campaignId: string;
+  webId: number;
   subject: string;
-  total: number;
-  sent: number;
-  failed: number;
-  created_at: string;
+  status: string;
+  emailsSent: number;
+  sendTime: string;
+  createTime: string;
+  archiveUrl: string;
+  recipientCount: number;
 };
+
+const roles = [
+  { value: "all", label: "All" },
+  { value: "event_planner", label: "Event planner" },
+  { value: "decorator", label: "Decorator" },
+  { value: "venue_staff", label: "Venue / Venue staff" },
+  { value: "other_creative_pro", label: "Other Creative Pro" },
+];
+
+function roleLabel(role?: string): string {
+  if (role === "planner") return "Event planner";
+  const found = roles.find((r) => r.value === role);
+  return found ? found.label : role || "";
+}
 
 export default function SendEmail() {
   const token = useAdminAuth();
   const [mode, setMode] = useState<"all" | "selected">("all");
+  const [roleFilter, setRoleFilter] = useState("all");
   const [subscribers, setSubscribers] = useState<WaitlistEntry[]>([]);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [customList, setCustomList] = useState<string[]>([]);
@@ -33,7 +52,9 @@ export default function SendEmail() {
   const [customErr, setCustomErr] = useState("");
   const [subject, setSubject] = useState("");
   const [bodyHtml, setBodyHtml] = useState("");
-  const [campaigns, setCampaigns] = useState<Campaign[]>([]);
+  const [campaigns, setCampaigns] = useState<BroadcastCampaign[]>([]);
+  const [campaignFilter, setCampaignFilter] = useState<"sent" | "draft" | "pending" | "running">("sent");
+  const [expandedCampaignId, setExpandedCampaignId] = useState<string | null>(null);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState("");
   const [result, setResult] = useState<{
@@ -52,37 +73,44 @@ export default function SendEmail() {
     }
 
     try {
-      const res = await fetch("/api/admin/campaigns");
+      const res = await fetch(`${backendBaseUrl()}/api/admin/broadcast-emails/${campaignFilter}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       if (res.ok) {
-        const data = await res.json();
-        setCampaigns(data.campaigns);
+        const json = await res.json();
+        setCampaigns(json.data || []);
       }
     } catch {
       /* ignore */
     }
-  }, [token]);
+  }, [token, campaignFilter]);
 
   useEffect(() => {
     load();
   }, [load]);
+
+  const filteredSubscribers = useMemo(() => {
+    if (roleFilter === "all") return subscribers;
+    if (roleFilter === "event_planner") {
+      return subscribers.filter((s) => s.role === "event_planner" || s.role === "planner");
+    }
+    return subscribers.filter((s) => s.role === roleFilter);
+  }, [subscribers, roleFilter]);
 
   const byEmail = useMemo(
     () => new Map(subscribers.map((s) => [s.email, s])),
     [subscribers]
   );
 
-  /** Waitlist emails that can resolve variables. */
   const registeredEmails = useMemo(
     () => new Set(subscribers.map((s) => (s.email || "").toLowerCase())),
     [subscribers]
   );
 
-  /** Custom emails that have no waitlist profile data. */
   const unregistered = customList.filter(
     (email) => !registeredEmails.has(email.toLowerCase())
   );
 
-  /** Vars for the selected recipients, used by the field preview tooltip. */
   const preview = useMemo<PreviewRecipient[]>(() => {
     if (mode !== "selected") return [];
     const list: PreviewRecipient[] = [];
@@ -98,7 +126,6 @@ export default function SendEmail() {
     return list;
   }, [mode, selected, byEmail]);
 
-  /** Strip tags from rich HTML to get the plain-text version for the email. */
   const textFromHtml = (html: string): string => {
     const doc = new DOMParser().parseFromString(html, "text/html");
     return (doc.body.textContent || "").replace(/\n{3,}/g, "\n\n").trim();
@@ -129,14 +156,9 @@ export default function SendEmail() {
       createdAt: s.createdAt || "",
     });
 
-    const registered =
-      mode === "all"
-        ? subscribers.map(pick)
-        : [...selected].map((email) =>
-            pick(byEmail.get(email) || { email })
-          );
+    const baseList = mode === "all" ? filteredSubscribers : filteredSubscribers.filter((s) => selected.has(s.email!));
+    const registered = baseList.map(pick);
 
-    // Merge registered + custom recipients, deduping by email.
     const seen = new Set<string>();
     const recipients: ReturnType<typeof pick>[] = [];
     for (const r of [
@@ -161,13 +183,12 @@ export default function SendEmail() {
       return;
     }
 
-    // Variables need per-recipient profile data; custom emails have none.
     const usesVars = [subject.trim(), bodyHtml].some((t) =>
       /\[[a-zA-Z][a-zA-Z0-9_]*\]/.test(t)
     );
     if (usesVars && unregistered.length) {
       setError(
-        `Variables can't be resolved for these recipients — they aren't on the waitlist: ${unregistered.join(", ")}. Register them first, or remove the variables.`
+        `Variables can't be resolved for these recipients: ${unregistered.join(", ")}. Register them first, or remove the variables.`
       );
       return;
     }
@@ -178,7 +199,6 @@ export default function SendEmail() {
       let failed = 0;
 
       if (!usesVars) {
-        // Same content for everyone → one bulk call to the hosted backend.
         const res = await sendBroadcastEmail(token, {
           emails: recipients.map((r) => r.email),
           subject: subject.trim(),
@@ -192,7 +212,6 @@ export default function SendEmail() {
         }
         queued = res.queuedCount ?? recipients.length;
       } else {
-        // Personalized content → one call per recipient with rendered templates.
         for (const r of recipients) {
           const vars = buildTemplateVars(r);
           const html = renderTemplate(bodyHtml, vars);
@@ -217,13 +236,13 @@ export default function SendEmail() {
     }
   }
 
-  const allChecked = subscribers.length > 0 && subscribers.every((s) => selected.has(s.email!));
+  const allChecked = filteredSubscribers.length > 0 && filteredSubscribers.every((s) => selected.has(s.email!));
 
   function toggleAll() {
     setSelected((prev) => {
       const next = new Set(prev);
-      if (allChecked) subscribers.forEach((s) => next.delete(s.email!));
-      else subscribers.forEach((s) => s.email && next.add(s.email));
+      if (allChecked) filteredSubscribers.forEach((s) => next.delete(s.email!));
+      else filteredSubscribers.forEach((s) => s.email && next.add(s.email));
       return next;
     });
   }
@@ -251,16 +270,75 @@ export default function SendEmail() {
   if (!token) {
     return (
       <AdminShell>
-        <div style={{ padding: 24 }}>Checking session…</div>
+        <div style={{ padding: 24 }}>Checking session...</div>
       </AdminShell>
     );
   }
+
+  const recipientCount = (mode === "all" ? filteredSubscribers.length : selected.size) + customList.length;
 
   return (
     <AdminShell>
       <h1 style={{ margin: "0 0 20px", fontSize: 24, fontWeight: 600, letterSpacing: "-0.02em" }}>
         Send email
       </h1>
+
+      {/* Role filter tabs */}
+      <div
+        style={{
+          display: "flex",
+          gap: 8,
+          marginBottom: 20,
+          flexWrap: "wrap",
+        }}
+      >
+        {roles.map((r) => {
+          const active = roleFilter === r.value;
+          const count = r.value === "all"
+            ? subscribers.length
+            : r.value === "event_planner"
+              ? subscribers.filter((e) => e.role === "event_planner" || e.role === "planner").length
+              : subscribers.filter((e) => e.role === r.value).length;
+          return (
+            <button
+              key={r.value}
+              onClick={() => {
+                setRoleFilter(r.value);
+                setSelected(new Set());
+              }}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 6,
+                height: 36,
+                padding: "0 14px",
+                borderRadius: "var(--radius-pill)",
+                border: "none",
+                cursor: "pointer",
+                fontSize: 13,
+                fontWeight: 600,
+                fontFamily: "var(--font-sans)",
+                transition: "all 150ms ease",
+                background: active ? "var(--navy-900)" : "rgba(39,34,53,0.05)",
+                color: active ? "white" : "var(--ink-900)",
+              }}
+            >
+              {r.label}
+              <span
+                style={{
+                  fontSize: 11,
+                  fontWeight: 600,
+                  padding: "2px 7px",
+                  borderRadius: "var(--radius-pill)",
+                  background: active ? "rgba(255,255,255,0.2)" : "rgba(39,34,53,0.08)",
+                }}
+              >
+                {count}
+              </span>
+            </button>
+          );
+        })}
+      </div>
 
       <div
         style={{
@@ -300,7 +378,7 @@ export default function SendEmail() {
                 color: mode === "all" ? "white" : "var(--ink-900)",
               }}
             >
-              All subscribers ({subscribers.length})
+              {roleFilter === "all" ? "All subscribers" : roleLabel(roleFilter)} ({filteredSubscribers.length})
             </button>
             <button
               onClick={() => setMode("selected")}
@@ -377,7 +455,7 @@ export default function SendEmail() {
                       padding: 0,
                     }}
                   >
-                    ×
+                    x
                   </button>
                 </span>
               ))}
@@ -396,10 +474,10 @@ export default function SendEmail() {
               <div style={{ padding: "8px 12px", borderBottom: "1px solid var(--line-100)" }}>
                 <label style={{ fontSize: 13, display: "flex", alignItems: "center", gap: 8 }}>
                   <input type="checkbox" checked={allChecked} onChange={toggleAll} />
-                  Select all ({subscribers.length})
+                  Select all ({filteredSubscribers.length})
                 </label>
               </div>
-              {subscribers.map((s) => (
+              {filteredSubscribers.map((s) => (
                 <label
                   key={s._id || s.email}
                   style={{
@@ -424,7 +502,7 @@ export default function SendEmail() {
                       });
                     }}
                   />
-                  {s.email || "—"}
+                  {s.email || "---"}
                 </label>
               ))}
             </div>
@@ -441,7 +519,6 @@ export default function SendEmail() {
           <RichEditor
             value={bodyHtml}
             onChange={setBodyHtml}
-            placeholder="Compose your email… Use the ＋ Variable button to add subscriber names, emails, etc."
             ariaLabel="Email body"
             preview={preview}
           />
@@ -451,8 +528,8 @@ export default function SendEmail() {
           </span>
 
           <div style={{ fontSize: 12, color: "var(--text-muted)" }}>
-            Sending to {(mode === "all" ? subscribers.length : selected.size) + customList.length}{" "}
-            recipient{(mode === "all" ? subscribers.length : selected.size) + customList.length === 1 ? "" : "s"}.
+            Sending to {recipientCount} recipient{recipientCount === 1 ? "" : "s"}
+            {roleFilter !== "all" ? ` (${roleLabel(roleFilter)})` : ""}.
           </div>
 
           {error && (
@@ -475,7 +552,7 @@ export default function SendEmail() {
               opacity: sending ? 0.6 : 1,
             }}
           >
-            {sending ? "Sending…" : "Send email"}
+            {sending ? "Sending..." : "Send email"}
           </button>
 
           {result && (
@@ -499,7 +576,7 @@ export default function SendEmail() {
                       result.failed === result.total ? "var(--error-500)" : "var(--success-500)",
                   }}
                 >
-                  {result.failed === result.total ? "✕" : "✓"}
+                  {result.failed === result.total ? "x" : "✓"}
                 </div>
                 <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700 }}>
                   {result.failed === result.total
@@ -546,8 +623,8 @@ export default function SendEmail() {
               <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
                 <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700 }}>Add recipients</h3>
                 <div style={{ fontSize: 13, color: "var(--text-muted)", lineHeight: 1.5 }}>
-                  These emails aren't on the waitlist. They'll receive the same content —
-                  variables like [firstName] won't resolve for them.
+                  These emails aren't on the waitlist. They'll receive the same content.
+                  Variables like [firstName] won't resolve for them.
                 </div>
                 <div style={{ display: "flex", gap: 8 }}>
                   <input
@@ -675,39 +752,143 @@ export default function SendEmail() {
             padding: 20,
           }}
         >
-          <h3 style={{ margin: "0 0 12px", fontSize: 16, fontWeight: 600 }}>Campaign history</h3>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
+            <h3 style={{ margin: 0, fontSize: 16, fontWeight: 600 }}>Campaign history</h3>
+            <button
+              onClick={load}
+              style={{
+                height: 32,
+                padding: "0 12px",
+                border: "none",
+                borderRadius: "var(--radius-md)",
+                background: "rgba(39,34,53,0.05)",
+                color: "var(--ink-900)",
+                fontFamily: "var(--font-sans)",
+                fontSize: 12,
+                fontWeight: 500,
+                cursor: "pointer",
+              }}
+            >
+              Refresh
+            </button>
+          </div>
+
+          {/* Status filter tabs */}
+          <div style={{ display: "flex", gap: 6, marginBottom: 12 }}>
+            {(["sent", "draft", "pending", "running"] as const).map((s) => (
+              <button
+                key={s}
+                onClick={() => setCampaignFilter(s)}
+                style={{
+                  height: 28,
+                  padding: "0 10px",
+                  border: "none",
+                  borderRadius: "var(--radius-pill)",
+                  fontFamily: "var(--font-sans)",
+                  fontSize: 12,
+                  fontWeight: 600,
+                  cursor: "pointer",
+                  textTransform: "capitalize",
+                  background: campaignFilter === s ? "var(--navy-900)" : "rgba(39,34,53,0.05)",
+                  color: campaignFilter === s ? "white" : "var(--ink-900)",
+                }}
+              >
+                {s}
+              </button>
+            ))}
+          </div>
+
           {campaigns.length === 0 ? (
-            <div style={{ fontSize: 14, color: "var(--text-faint)", fontWeight: 500 }}>
-              No campaigns sent yet.
+            <div style={{ fontSize: 14, color: "var(--text-faint)", fontWeight: 500, padding: "20px 0", textAlign: "center" }}>
+              No {campaignFilter} campaigns found.
             </div>
           ) : (
-            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              {campaigns.map((c) => (
+            <div style={{ display: "flex", flexDirection: "column", gap: 10, maxHeight: 400, overflowY: "auto" }}>
+              {campaigns.map((c) => {
+                const expanded = expandedCampaignId === c.campaignId;
+                return (
                 <div
-                  key={c.id}
+                  key={c.campaignId}
+                  onClick={() => setExpandedCampaignId(expanded ? null : c.campaignId)}
                   style={{
-                    padding: "12px 14px",
-                    border: "1px solid var(--line-100)",
+                    padding: "14px",
+                    border: expanded ? "1px solid var(--blue-600)" : "1px solid var(--line-100)",
                     borderRadius: "var(--radius-md)",
                     display: "flex",
                     flexDirection: "column",
-                    gap: 4,
+                    gap: 8,
+                    cursor: "pointer",
+                    transition: "border-color 150ms ease, box-shadow 150ms ease",
+                    boxShadow: expanded ? "0 0 0 1px var(--blue-600)" : "none",
                   }}
                 >
-                  <div style={{ fontSize: 14, fontWeight: 600 }}>{c.subject}</div>
-                  <div style={{ fontSize: 12, color: "var(--text-muted)" }}>
-                    {new Date(c.created_at).toLocaleString()} · {c.total} recipients ·{" "}
-                    <span style={{ color: "var(--success-500)" }}>{c.sent} sent</span>
-                    {c.failed > 0 && (
-                      <span style={{ color: "var(--error-500)" }}> · {c.failed} failed</span>
-                    )}
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
+                    <div style={{ fontSize: 14, fontWeight: 600 }}>{c.subject || "(no subject)"}</div>
+                    <span
+                      style={{
+                        fontSize: 11,
+                        fontWeight: 600,
+                        padding: "3px 8px",
+                        borderRadius: "var(--radius-pill)",
+                        background:
+                          c.status === "sent"
+                            ? "rgba(16,185,129,0.1)"
+                            : c.status === "running"
+                              ? "rgba(0,86,169,0.1)"
+                              : "rgba(39,34,53,0.08)",
+                        color:
+                          c.status === "sent"
+                            ? "var(--success-500)"
+                            : c.status === "running"
+                              ? "var(--blue-600)"
+                              : "var(--text-muted)",
+                        textTransform: "capitalize",
+                      }}
+                    >
+                      {c.status}
+                    </span>
                   </div>
+                  <div style={{ display: "flex", gap: 16, fontSize: 12, color: "var(--text-muted)" }}>
+                    <span>{c.emailsSent} recipients</span>
+                    <span>{new Date(c.sendTime).toLocaleDateString()}</span>
+                  </div>
+
+                  {expanded && (
+                    <div
+                      onClick={(e) => e.stopPropagation()}
+                      style={{ display: "flex", flexDirection: "column", gap: 10, paddingTop: 10, borderTop: "1px solid var(--line-100)", marginTop: 2 }}
+                    >
+                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+                        <div style={{ padding: "10px 12px", background: "rgba(39,34,53,0.04)", borderRadius: "var(--radius-md)" }}>
+                          <div style={{ fontSize: 11, color: "var(--text-muted)", marginBottom: 4 }}>Recipients</div>
+                          <div style={{ fontSize: 18, fontWeight: 700 }}>{c.emailsSent}</div>
+                        </div>
+                        <div style={{ padding: "10px 12px", background: "rgba(39,34,53,0.04)", borderRadius: "var(--radius-md)" }}>
+                          <div style={{ fontSize: 11, color: "var(--text-muted)", marginBottom: 4 }}>Sent</div>
+                          <div style={{ fontSize: 14, fontWeight: 600 }}>{new Date(c.sendTime).toLocaleString()}</div>
+                        </div>
+                      </div>
+                      {c.archiveUrl && (
+                        <a
+                          href={c.archiveUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={(e) => e.stopPropagation()}
+                          style={{ fontSize: 13, fontWeight: 600, color: "var(--blue-600)", textDecoration: "none" }}
+                        >
+                          View in Mailchimp
+                        </a>
+                      )}
+                    </div>
+                  )}
                 </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>
       </div>
+
     </AdminShell>
   );
 }

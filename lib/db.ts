@@ -18,7 +18,7 @@ db.exec(`
   CREATE TABLE IF NOT EXISTS subscribers (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     email TEXT NOT NULL UNIQUE,
-    role TEXT NOT NULL DEFAULT 'planner',
+    role TEXT NOT NULL DEFAULT 'event_planner',
     whatsapp_on INTEGER NOT NULL DEFAULT 0,
     phone TEXT,
     source TEXT,
@@ -69,11 +69,16 @@ db.exec(
   `CREATE UNIQUE INDEX IF NOT EXISTS idx_subscribers_remote_id ON subscribers(remote_id)`
 );
 
+// Migrate old role values to new ones
+db.exec(`UPDATE subscribers SET role = 'event_planner' WHERE role = 'planner'`);
+db.exec(`UPDATE subscribers SET role = 'venue_staff' WHERE role = 'venue'`);
+db.exec(`UPDATE subscribers SET role = 'venue_staff' WHERE role = 'venue_owner'`);
+
 export type Subscriber = {
   id: number;
   email: string;
   name: string | null;
-  role: "planner" | "venue";
+  role: "event_planner" | "decorator" | "venue_staff" | "other_creative_pro";
   whatsapp_on: 0 | 1;
   phone: string | null;
   source: string | null;
@@ -116,10 +121,12 @@ export function addSubscriber(input: {
   source?: string;
 }): { created: boolean } {
   const email = input.email.trim().toLowerCase();
+  const validRoles = ["event_planner", "decorator", "venue_staff", "other_creative_pro"];
+  const role = validRoles.includes(input.role || "") ? input.role! : "event_planner";
   const info = insertSub.run({
     email,
     name: input.name?.trim() ? input.name.trim() : null,
-    role: input.role === "venue" ? "venue" : "planner",
+    role,
     whatsapp_on: input.whatsappOn ? 1 : 0,
     phone: input.whatsappOn && input.phone?.trim() ? input.phone.trim() : null,
     source: input.source || null,
@@ -129,7 +136,7 @@ export function addSubscriber(input: {
 
 const insertRemote = db.prepare(`
   INSERT INTO subscribers (remote_id, email, name, role, whatsapp_on, phone, source, created_at)
-  VALUES (@remoteId, @email, @name, 'planner', 0, NULL, 'backend', COALESCE(@createdAt, datetime('now')))
+  VALUES (@remoteId, @email, @name, 'event_planner', 0, NULL, 'backend', COALESCE(@createdAt, datetime('now')))
 `);
 
 export function upsertSubscriberFromRemote(input: {
@@ -237,6 +244,8 @@ export function updateSubscriber(
 ): boolean {
   const sub = getSubscriber(id);
   if (!sub) return false;
+  const validRoles = ["event_planner", "decorator", "venue_staff", "other_creative_pro"];
+  const role = validRoles.includes(patch.role || "") ? patch.role! : sub.role;
   db.prepare(
     `UPDATE subscribers SET
        role = @role,
@@ -245,7 +254,7 @@ export function updateSubscriber(
      WHERE id = @id`
   ).run({
     id,
-    role: patch.role === "venue" ? "venue" : "planner",
+    role,
     whatsapp_on: patch.whatsappOn ? 1 : sub.whatsapp_on,
     phone: patch.phone !== undefined ? patch.phone : sub.phone,
   });
@@ -264,35 +273,31 @@ export function getStats() {
   const total = (
     db.prepare(`SELECT COUNT(*) AS c FROM subscribers WHERE deleted_at IS NULL`).get() as { c: number }
   ).c;
-  const planners = (
-    db.prepare(`SELECT COUNT(*) AS c FROM subscribers WHERE role = 'planner' AND deleted_at IS NULL`).get() as {
-      c: number;
-    }
+  const eventPlanners = (
+    db.prepare(`SELECT COUNT(*) AS c FROM subscribers WHERE role = 'event_planner' AND deleted_at IS NULL`).get() as { c: number }
   ).c;
-  const venues = (
-    db.prepare(`SELECT COUNT(*) AS c FROM subscribers WHERE role = 'venue' AND deleted_at IS NULL`).get() as {
-      c: number;
-    }
+  const decorators = (
+    db.prepare(`SELECT COUNT(*) AS c FROM subscribers WHERE role = 'decorator' AND deleted_at IS NULL`).get() as { c: number }
+  ).c;
+  const venueStaff = (
+    db.prepare(`SELECT COUNT(*) AS c FROM subscribers WHERE role = 'venue_staff' AND deleted_at IS NULL`).get() as { c: number }
+  ).c;
+  const otherCreativePros = (
+    db.prepare(`SELECT COUNT(*) AS c FROM subscribers WHERE role = 'other_creative_pro' AND deleted_at IS NULL`).get() as { c: number }
   ).c;
   const whatsapp = (
-    db.prepare(`SELECT COUNT(*) AS c FROM subscribers WHERE whatsapp_on = 1 AND deleted_at IS NULL`).get() as {
-      c: number;
-    }
+    db.prepare(`SELECT COUNT(*) AS c FROM subscribers WHERE whatsapp_on = 1 AND deleted_at IS NULL`).get() as { c: number }
   ).c;
   const sent = (
-    db.prepare(`SELECT COUNT(*) AS c FROM mail_logs WHERE status = 'sent'`).get() as {
-      c: number;
-    }
+    db.prepare(`SELECT COUNT(*) AS c FROM mail_logs WHERE status = 'sent'`).get() as { c: number }
   ).c;
   const failed = (
-    db.prepare(`SELECT COUNT(*) AS c FROM mail_logs WHERE status = 'failed'`).get() as {
-      c: number;
-    }
+    db.prepare(`SELECT COUNT(*) AS c FROM mail_logs WHERE status = 'failed'`).get() as { c: number }
   ).c;
   const recent = db
     .prepare(`SELECT * FROM subscribers WHERE deleted_at IS NULL ORDER BY created_at DESC, id DESC LIMIT 6`)
     .all() as Subscriber[];
-  return { total, planners, venues, whatsapp, sent, failed, recent };
+  return { total, eventPlanners, decorators, venueStaff, otherCreativePros, whatsapp, sent, failed, recent };
 }
 
 export function listCampaigns(limit = 50): Campaign[] {

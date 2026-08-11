@@ -5,17 +5,16 @@ import AdminShell, { StatCard } from "./components/AdminShell";
 import { useAdminAuth } from "@/lib/useAdminAuth";
 import { backendBaseUrl, fetchWaitlist } from "@/lib/backend-client";
 
-type MailStats = {
-  sent: number;
-  failed: number;
-  smtpConfigured: boolean;
-  recentMail: {
-    id: number;
-    email: string;
-    subject: string | null;
-    status: string;
-    created_at: string;
-  }[];
+type BroadcastCampaign = {
+  campaignId: string;
+  webId: number;
+  subject: string;
+  status: string;
+  emailsSent: number;
+  sendTime: string;
+  createTime: string;
+  archiveUrl: string;
+  recipientCount: number;
 };
 
 export default function Dashboard() {
@@ -24,7 +23,8 @@ export default function Dashboard() {
   const [recent, setRecent] = useState<
     { _id?: string; email?: string; name?: string; createdAt?: string }[]
   >([]);
-  const [mailStats, setMailStats] = useState<MailStats | null>(null);
+  const [campaigns, setCampaigns] = useState<BroadcastCampaign[]>([]);
+  const [totalEmailsSent, setTotalEmailsSent] = useState<number | null>(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -53,8 +53,15 @@ export default function Dashboard() {
       }
 
       try {
-        const res = await fetch("/api/admin/mail-stats");
-        if (res.ok) setMailStats(await res.json());
+        const res = await fetch(`${backendBaseUrl()}/api/admin/broadcast-emails/sent`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (res.ok) {
+          const json = await res.json();
+          const camps = json.data || [];
+          setCampaigns(camps);
+          setTotalEmailsSent(camps.reduce((sum: number, c: BroadcastCampaign) => sum + (c.emailsSent || 0), 0));
+        }
       } catch {
         /* ignore */
       }
@@ -140,24 +147,8 @@ export default function Dashboard() {
         }}
       >
         <StatCard label="Subscribers" value={loading ? "…" : total ?? "–"} />
-        <StatCard label="Emails sent" value={mailStats?.sent ?? "–"} accent="var(--success-500)" />
-        <StatCard label="Emails failed" value={mailStats?.failed ?? "–"} accent="var(--error-500)" />
-      </div>
-
-      <div
-        style={{
-          marginTop: 20,
-          padding: 14,
-          borderRadius: "var(--radius-md)",
-          background: "rgba(245,158,11,0.1)",
-          color: "var(--warning-600)",
-          fontSize: 14,
-          fontWeight: 500,
-        }}
-      >
-        Emails are sent from the hosted backend via /api/admin/broadcast-email. The
-        &quot;Emails sent / failed&quot; stats below reflect this server&apos;s local SMTP log and
-        will stay at 0 while using the hosted endpoint.
+        <StatCard label="Success" value={loading ? "…" : totalEmailsSent ?? "–"} accent="var(--success-500)" />
+        <StatCard label="Total" value={loading ? "…" : campaigns.length} />
       </div>
 
       <div
@@ -199,11 +190,11 @@ export default function Dashboard() {
           )}
         </Panel>
 
-        <Panel title="Recent mail">
-          {mailStats?.recentMail.length ? (
-            mailStats.recentMail.map((m) => (
+        <Panel title="Recent campaigns">
+          {campaigns.length ? (
+            campaigns.slice(0, 5).map((c) => (
               <div
-                key={m.id}
+                key={c.campaignId}
                 style={{
                   display: "flex",
                   justifyContent: "space-between",
@@ -216,24 +207,26 @@ export default function Dashboard() {
                   <div
                     style={{ fontSize: 13, fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis" }}
                   >
-                    {m.email}
+                    {c.subject || "(no subject)"}
                   </div>
-                  <div style={{ fontSize: 12, color: "var(--text-muted)" }}>{m.subject}</div>
+                  <div style={{ fontSize: 12, color: "var(--text-muted)" }}>
+                    {c.emailsSent} recipients · {new Date(c.sendTime).toLocaleDateString()}
+                  </div>
                 </div>
                 <span
                   style={{
                     fontSize: 12,
                     fontWeight: 600,
-                    color: m.status === "sent" ? "var(--success-500)" : "var(--error-500)",
+                    color: "var(--success-500)",
                     whiteSpace: "nowrap",
                   }}
                 >
-                  {m.status}
+                  {c.emailsSent} sent
                 </span>
               </div>
             ))
           ) : (
-            <Empty>No mail sent yet.</Empty>
+            <Empty>No campaigns sent yet.</Empty>
           )}
         </Panel>
       </div>
