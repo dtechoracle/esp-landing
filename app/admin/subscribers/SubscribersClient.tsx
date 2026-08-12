@@ -265,10 +265,11 @@ export default function Subscribers() {
           overflow: "auto",
         }}
       >
-        <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 720 }}>
+        <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 820 }}>
           <thead>
             <tr style={{ textAlign: "left", borderBottom: "1px solid var(--line-200)" }}>
-              <th style={thStyle}>Name</th>
+              <th style={thStyle}>First Name</th>
+              <th style={thStyle}>Last Name</th>
               <th style={thStyle}>Email</th>
               <th style={thStyle}>Role</th>
               <th style={thStyle}>Phone</th>
@@ -280,13 +281,13 @@ export default function Subscribers() {
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan={7} style={{ padding: 24, textAlign: "center", color: "var(--text-muted)" }}>
+                <td colSpan={8} style={{ padding: 24, textAlign: "center", color: "var(--text-muted)" }}>
                   Loading...
                 </td>
               </tr>
             ) : rows.length === 0 ? (
               <tr>
-                <td colSpan={7} style={{ padding: 24, textAlign: "center", color: "var(--text-muted)" }}>
+                <td colSpan={8} style={{ padding: 24, textAlign: "center", color: "var(--text-muted)" }}>
                   {search.trim() || roleFilter !== "all"
                     ? "No subscribers match your filters."
                     : "No subscribers yet."}
@@ -295,10 +296,16 @@ export default function Subscribers() {
             ) : (
               rows.map((s) => {
                 const colors = roleColor(s.role);
+                const nameParts = (s.name || "").split(" ");
+                const firstName = nameParts[0] || "—";
+                const lastName = nameParts.slice(1).join(" ") || "—";
                 return (
                   <tr key={s._id || s.email} style={{ borderBottom: "1px solid var(--line-100)" }}>
                     <td style={tdStyle}>
-                      <div style={{ fontWeight: 600 }}>{s.name || "—"}</div>
+                      <div style={{ fontWeight: 600 }}>{firstName}</div>
+                    </td>
+                    <td style={tdStyle}>
+                      <div style={{ fontWeight: 600 }}>{lastName}</div>
                     </td>
                     <td style={tdStyle}>
                       <div style={{ fontWeight: 600 }}>{s.email || "—"}</div>

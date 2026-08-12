@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { Fragment, useRef, useState } from "react";
 import Button from "./Button";
 import { waitlistSignup } from "@/lib/backend-client";
 
@@ -24,19 +24,25 @@ const inputStyle: React.CSSProperties = {
 };
 
 export default function WaitlistForm() {
-  const [name, setName] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
-  const [role, setRole] = useState("Event planner");
+  const [role, setRole] = useState("event_planner");
   const [whatsappOn, setWhatsappOn] = useState(false);
   const [status, setStatus] = useState<"idle" | "submitting">("idle");
+  const [showSuccess, setShowSuccess] = useState(false);
   const [error, setError] = useState("");
   const emailRef = useRef<HTMLInputElement>(null);
 
   async function submit() {
     setError("");
-    if (!name.trim()) {
-      setError("Enter your name.");
+    if (!firstName.trim()) {
+      setError("Enter your first name.");
+      return;
+    }
+    if (!lastName.trim()) {
+      setError("Enter your last name.");
       return;
     }
     if (!EMAIL_RE.test(email)) {
@@ -53,18 +59,27 @@ export default function WaitlistForm() {
     try {
       const result = await waitlistSignup({
         email: email.trim(),
-        name: name.trim(),
+        name: `${firstName.trim()} ${lastName.trim()}`,
         role,
         whatsappOn,
         phone: phone.trim(),
       });
 
       if (result.ok || result.status === 409) {
-        if (whatsappOn) {
-          window.open("https://whatsapp.com/channel/0029VbDahNlLdQej7Bpe5L3t", "_blank");
-        }
+        setFirstName("");
+        setLastName("");
+        setEmail("");
+        setPhone("");
+        setRole("event_planner");
+        setWhatsappOn(false);
         setStatus("idle");
         setError("");
+        setShowSuccess(true);
+        if (whatsappOn) {
+          setTimeout(() => {
+            window.open("https://whatsapp.com/channel/0029VbDahNlLdQej7Bpe5L3t", "_blank");
+          }, 3000);
+        }
         return;
       }
 
@@ -77,6 +92,7 @@ export default function WaitlistForm() {
   }
 
   return (
+    <>
     <div
       id="waitlist"
       style={{
@@ -96,16 +112,32 @@ export default function WaitlistForm() {
         <span style={{ fontSize: 16, fontWeight: 700, letterSpacing: "-0.015em" }}>
           Get early access
         </span>
-        <span style={{ fontSize: 13, fontWeight: 500, color: "var(--text-muted)" }}>Your name</span>
-        <input
-          type="text"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && submit()}
-          placeholder="Your name"
-          aria-label="Your name"
-          style={{ ...inputStyle, width: "100%" }}
-        />
+        <div style={{ display: "flex", gap: 10, width: "100%" }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 6, flex: 1 }}>
+            <span style={{ fontSize: 13, fontWeight: 500, color: "var(--text-muted)" }}>First name</span>
+            <input
+              type="text"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && submit()}
+              placeholder="First name"
+              aria-label="First name"
+              style={{ ...inputStyle, width: "100%" }}
+            />
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 6, flex: 1 }}>
+            <span style={{ fontSize: 13, fontWeight: 500, color: "var(--text-muted)" }}>Last name</span>
+            <input
+              type="text"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && submit()}
+              placeholder="Last name"
+              aria-label="Last name"
+              style={{ ...inputStyle, width: "100%" }}
+            />
+          </div>
+        </div>
         <span style={{ fontSize: 13, fontWeight: 500, color: "var(--text-muted)" }}>I&apos;m a…</span>
         <select
           value={role}
@@ -210,5 +242,78 @@ export default function WaitlistForm() {
       </span>
 
     </div>
+
+      {showSuccess && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,0.4)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 1000,
+          }}
+          onClick={() => setShowSuccess(false)}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              background: "var(--surface-card)",
+              borderRadius: "var(--radius-lg)",
+              boxShadow: "var(--shadow-card)",
+              padding: 32,
+              maxWidth: 400,
+              width: "100%",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: 16,
+              textAlign: "center",
+            }}
+          >
+            <div
+              style={{
+                width: 56,
+                height: 56,
+                borderRadius: "50%",
+                background: "rgba(16,185,129,0.1)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: 28,
+              }}
+            >
+              ✓
+            </div>
+            <div style={{ fontSize: 18, fontWeight: 700 }}>You&apos;re on the list!</div>
+            <div style={{ fontSize: 14, color: "var(--text-muted)", lineHeight: 1.5 }}>
+              We&apos;ll send you an email when your invite is ready.
+              {whatsappOn && (
+                <span> Redirecting to WhatsApp in 3 seconds…</span>
+              )}
+            </div>
+            <button
+              onClick={() => setShowSuccess(false)}
+              style={{
+                height: 44,
+                padding: "0 24px",
+                border: "none",
+                borderRadius: "var(--radius-pill)",
+                background: "var(--accent)",
+                color: "white",
+                fontFamily: "var(--font-sans)",
+                fontWeight: 500,
+                fontSize: 15,
+                cursor: "pointer",
+                marginTop: 8,
+              }}
+            >
+              Got it
+            </button>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
