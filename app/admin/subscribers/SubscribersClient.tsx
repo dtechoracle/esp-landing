@@ -140,10 +140,14 @@ export default function Subscribers() {
   }
 
   function exportCsv() {
-    const header = "name,email,role,phone,whatsapp,joined";
-    const lines = rows.map((s) =>
-      [
-        s.name || "",
+    const header = "first_name,last_name,email,role,phone,whatsapp,joined";
+    const lines = rows.map((s) => {
+      const nameParts = (s.name || "").split(" ");
+      const firstName = nameParts[0] || "";
+      const lastName = nameParts.slice(1).join(" ") || "";
+      return [
+        firstName,
+        lastName,
         s.email || "",
         roleLabel(s.role),
         s.phone || "",
@@ -151,8 +155,8 @@ export default function Subscribers() {
         s.createdAt ? new Date(s.createdAt).toLocaleString() : "",
       ]
         .map((v) => `"${String(v).replaceAll('"', '""')}"`)
-        .join(",")
-    );
+        .join(",");
+    });
     const blob = new Blob([[header, ...lines].join("\n")], {
       type: "text/csv;charset=utf-8",
     });

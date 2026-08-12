@@ -219,6 +219,36 @@ export default function AdminShell({ children }: { children: ReactNode }) {
                 {item.label}
               </a>
             ))}
+            <div style={{ height: 1, background: "var(--line-100)", margin: "4px 0" }} />
+            <a
+              href="/"
+              style={{
+                padding: "12px 16px",
+                borderRadius: "var(--radius-md)",
+                color: "var(--ink-900)",
+                fontWeight: 500,
+                fontSize: 14,
+              }}
+            >
+              ← View site
+            </a>
+            <button
+              onClick={() => { handleLogout(); setOpen(false); }}
+              style={{
+                background: "transparent",
+                border: "none",
+                color: "var(--error-500)",
+                padding: "12px 16px",
+                fontSize: 14,
+                fontWeight: 600,
+                cursor: "pointer",
+                fontFamily: "var(--font-sans)",
+                textAlign: "left",
+                borderRadius: "var(--radius-md)",
+              }}
+            >
+              Sign out
+            </button>
           </div>
         )}
 
