@@ -254,7 +254,7 @@ export default function WaitlistForm() {
         name: `${firstName.trim()} ${lastName.trim()}`,
         role,
         whatsappOn,
-        phone: `${countryCode}${phone.trim()}`,
+        phone: whatsappOn ? `${countryCode}${phone.trim()}` : "",
       });
 
       if (result.ok || result.status === 409) {
