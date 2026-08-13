@@ -222,6 +222,8 @@ export default function WaitlistForm() {
   const [whatsappOn, setWhatsappOn] = useState(false);
   const [status, setStatus] = useState<"idle" | "submitting">("idle");
   const [showSuccess, setShowSuccess] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
+  const [isDuplicate, setIsDuplicate] = useState(false);
   const [error, setError] = useState("");
   const emailRef = useRef<HTMLInputElement>(null);
 
@@ -256,6 +258,9 @@ export default function WaitlistForm() {
       });
 
       if (result.ok || result.status === 409) {
+        const msg = result.message || "You're on the list! We'll send you an email when your invite is ready.";
+        const shouldRedirect = whatsappOn;
+        const duplicate = result.status === 409;
         setFirstName("");
         setLastName("");
         setEmail("");
@@ -265,8 +270,10 @@ export default function WaitlistForm() {
         setWhatsappOn(false);
         setStatus("idle");
         setError("");
+        setSuccessMessage(msg);
+        setIsDuplicate(duplicate);
         setShowSuccess(true);
-        if (whatsappOn) {
+        if (shouldRedirect && !duplicate) {
           setTimeout(() => {
             window.open("https://whatsapp.com/channel/0029VbDahNlLdQej7Bpe5L3t", "_blank");
           }, 3000);
@@ -484,8 +491,8 @@ export default function WaitlistForm() {
               borderRadius: "var(--radius-lg)",
               boxShadow: "var(--shadow-card)",
               padding: 32,
-              maxWidth: 400,
-              width: "100%",
+              maxWidth: 320,
+              width: "calc(100% - 48px)",
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
@@ -498,19 +505,21 @@ export default function WaitlistForm() {
                 width: 56,
                 height: 56,
                 borderRadius: "50%",
-                background: "rgba(16,185,129,0.1)",
+                background: isDuplicate ? "rgba(239,68,68,0.1)" : "rgba(16,185,129,0.1)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 fontSize: 28,
               }}
             >
-              ✓
+              {isDuplicate ? "!" : "✓"}
             </div>
-            <div style={{ fontSize: 18, fontWeight: 700 }}>You&apos;re on the list!</div>
+            <div style={{ fontSize: 18, fontWeight: 700 }}>
+              {isDuplicate ? "Already registered" : "Success!"}
+            </div>
             <div style={{ fontSize: 14, color: "var(--text-muted)", lineHeight: 1.5 }}>
-              We&apos;ll send you an email when your invite is ready.
-              {whatsappOn && (
+              {successMessage}
+              {!isDuplicate && whatsappOn && (
                 <span> Redirecting to WhatsApp in 3 seconds…</span>
               )}
             </div>
