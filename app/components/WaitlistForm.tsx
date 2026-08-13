@@ -184,6 +184,16 @@ const countries = [
   { code: "+597", iso: "sr", name: "Suriname" },
 ];
 
+const priority = ["ng", "gb", "us"];
+countries.sort((a, b) => {
+  const aIdx = priority.indexOf(a.iso);
+  const bIdx = priority.indexOf(b.iso);
+  if (aIdx !== -1 && bIdx !== -1) return aIdx - bIdx;
+  if (aIdx !== -1) return -1;
+  if (bIdx !== -1) return 1;
+  return a.name.localeCompare(b.name);
+});
+
 const inputStyle: React.CSSProperties = {
   height: 46,
   border: "none",
