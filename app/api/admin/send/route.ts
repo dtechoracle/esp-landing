@@ -47,6 +47,8 @@ export async function POST(req: NextRequest) {
       recipients.push({
         email,
         name: typeof rec.name === "string" ? rec.name : undefined,
+        firstName: typeof rec.firstName === "string" ? rec.firstName : undefined,
+        lastName: typeof rec.lastName === "string" ? rec.lastName : undefined,
         role: typeof rec.role === "string" ? rec.role : undefined,
         phone: typeof rec.phone === "string" ? rec.phone : undefined,
         whatsappOn: typeof rec.whatsappOn === "boolean" ? rec.whatsappOn : undefined,

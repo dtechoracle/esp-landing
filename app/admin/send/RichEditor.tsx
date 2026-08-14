@@ -6,6 +6,8 @@ import { AVAILABLE_VARS, type TemplateVars } from "@/lib/template";
 export type PreviewRecipient = {
   email: string;
   name?: string;
+  firstName?: string;
+  lastName?: string;
   vars: TemplateVars;
 };
 

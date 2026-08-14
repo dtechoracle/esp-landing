@@ -62,8 +62,25 @@ function ensureColumn(table: string, column: string, ddl: string) {
   }
 }
 ensureColumn("subscribers", "name", "name TEXT");
+ensureColumn("subscribers", "first_name", "first_name TEXT");
+ensureColumn("subscribers", "last_name", "last_name TEXT");
 ensureColumn("subscribers", "remote_id", "remote_id TEXT");
 ensureColumn("subscribers", "deleted_at", "deleted_at TEXT");
+
+// Migrate existing name data into first_name/last_name columns.
+db.exec(`
+  UPDATE subscribers
+  SET first_name = CASE
+    WHEN name IS NOT NULL AND TRIM(name) != '' THEN TRIM(SUBSTR(TRIM(name), 1, INSTR(TRIM(name) || ' ', ' ') - 1))
+    ELSE NULL
+  END,
+  last_name = CASE
+    WHEN name IS NOT NULL AND TRIM(name) != '' AND INSTR(TRIM(name), ' ') > 0
+    THEN TRIM(SUBSTR(TRIM(name), INSTR(TRIM(name), ' ') + 1))
+    ELSE NULL
+  END
+  WHERE first_name IS NULL OR first_name = ''
+`);
 ensureColumn("admin_sessions", "backend_token", "backend_token TEXT");
 db.exec(
   `CREATE UNIQUE INDEX IF NOT EXISTS idx_subscribers_remote_id ON subscribers(remote_id)`
@@ -78,6 +95,8 @@ export type Subscriber = {
   id: number;
   email: string;
   name: string | null;
+  first_name: string | null;
+  last_name: string | null;
   role: "event_planner" | "decorator" | "venue_staff" | "other_creative_pro";
   whatsapp_on: 0 | 1;
   phone: string | null;
@@ -107,13 +126,15 @@ export type MailLog = {
 };
 
 const insertSub = db.prepare(`
-  INSERT INTO subscribers (email, name, role, whatsapp_on, phone, source)
-  VALUES (@email, @name, @role, @whatsapp_on, @phone, @source)
+  INSERT INTO subscribers (email, name, first_name, last_name, role, whatsapp_on, phone, source)
+  VALUES (@email, @name, @first_name, @last_name, @role, @whatsapp_on, @phone, @source)
   ON CONFLICT(email) DO NOTHING
 `);
 
 export function addSubscriber(input: {
   email: string;
+  firstName?: string;
+  lastName?: string;
   name?: string;
   role?: string;
   whatsappOn?: boolean;
@@ -123,9 +144,14 @@ export function addSubscriber(input: {
   const email = input.email.trim().toLowerCase();
   const validRoles = ["event_planner", "decorator", "venue_staff", "other_creative_pro"];
   const role = validRoles.includes(input.role || "") ? input.role! : "event_planner";
+  const firstName = input.firstName?.trim() || null;
+  const lastName = input.lastName?.trim() || null;
+  const name = input.name?.trim() || (firstName && lastName ? `${firstName} ${lastName}` : firstName || null);
   const info = insertSub.run({
     email,
-    name: input.name?.trim() ? input.name.trim() : null,
+    name,
+    first_name: firstName,
+    last_name: lastName,
     role,
     whatsapp_on: input.whatsappOn ? 1 : 0,
     phone: input.whatsappOn && input.phone?.trim() ? input.phone.trim() : null,
@@ -135,18 +161,22 @@ export function addSubscriber(input: {
 }
 
 const insertRemote = db.prepare(`
-  INSERT INTO subscribers (remote_id, email, name, role, whatsapp_on, phone, source, created_at)
-  VALUES (@remoteId, @email, @name, 'event_planner', 0, NULL, 'backend', COALESCE(@createdAt, datetime('now')))
+  INSERT INTO subscribers (remote_id, email, name, first_name, last_name, role, whatsapp_on, phone, source, created_at)
+  VALUES (@remoteId, @email, @name, @first_name, @last_name, 'event_planner', 0, NULL, 'backend', COALESCE(@createdAt, datetime('now')))
 `);
 
 export function upsertSubscriberFromRemote(input: {
   remoteId?: string;
   email: string;
   name?: string;
+  firstName?: string;
+  lastName?: string;
   createdAt?: string;
 }): { created: boolean; matchedByEmail: boolean } {
   const email = input.email.trim().toLowerCase();
-  const name = input.name?.trim() ? input.name.trim() : null;
+  const firstName = input.firstName?.trim() || null;
+  const lastName = input.lastName?.trim() || null;
+  const name = input.name?.trim() || (firstName && lastName ? `${firstName} ${lastName}` : firstName || null);
 
   let createdAt: string | null = null;
   if (input.createdAt) {
@@ -165,8 +195,8 @@ export function upsertSubscriberFromRemote(input: {
         return { created: false, matchedByEmail: false };
       }
       db.prepare(
-        `UPDATE subscribers SET email = @email, name = @name, source = 'backend' WHERE id = @id`
-      ).run({ id: byRemote.id, email, name });
+        `UPDATE subscribers SET email = @email, name = @name, first_name = @first_name, last_name = @last_name, source = 'backend' WHERE id = @id`
+      ).run({ id: byRemote.id, email, name, first_name: firstName, last_name: lastName });
       return { created: false, matchedByEmail: false };
     }
   }
@@ -179,8 +209,8 @@ export function upsertSubscriberFromRemote(input: {
       return { created: false, matchedByEmail: true };
     }
     db.prepare(
-      `UPDATE subscribers SET name = @name, remote_id = @remoteId, source = 'backend' WHERE id = @id`
-    ).run({ id: byEmail.id, name, remoteId: input.remoteId || null });
+      `UPDATE subscribers SET name = @name, first_name = @first_name, last_name = @last_name, remote_id = @remoteId, source = 'backend' WHERE id = @id`
+    ).run({ id: byEmail.id, name, first_name: firstName, last_name: lastName, remoteId: input.remoteId || null });
     return { created: false, matchedByEmail: true };
   }
 
@@ -188,6 +218,8 @@ export function upsertSubscriberFromRemote(input: {
     remoteId: input.remoteId || null,
     email,
     name,
+    first_name: firstName,
+    last_name: lastName,
     createdAt,
   });
   return { created: info.changes > 0, matchedByEmail: false };
@@ -203,7 +235,7 @@ export function listSubscribers(filters?: {
   const params: Record<string, string | number> = {};
 
   if (filters?.q) {
-    where.push("(email LIKE @q OR name LIKE @q OR phone LIKE @q)");
+    where.push("(email LIKE @q OR name LIKE @q OR first_name LIKE @q OR last_name LIKE @q OR phone LIKE @q)");
     params.q = `%${filters.q}%`;
   }
   if (filters?.role === "planner" || filters?.role === "venue") {

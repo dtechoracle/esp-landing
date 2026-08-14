@@ -120,6 +120,8 @@ export default function SendEmail() {
       list.push({
         email: email || "",
         name: s.name || "",
+        firstName: s.firstName || "",
+        lastName: s.lastName || "",
         vars: buildTemplateVars(s),
       });
     }
@@ -150,6 +152,8 @@ export default function SendEmail() {
     const pick = (s: WaitlistEntry) => ({
       email: s.email || "",
       name: s.name || "",
+      firstName: s.firstName || "",
+      lastName: s.lastName || "",
       role: s.role || "",
       phone: s.phone || "",
       whatsappOn: !!s.whatsappOn,
@@ -166,6 +170,8 @@ export default function SendEmail() {
       ...customList.map((email) => ({
         email,
         name: "",
+        firstName: "",
+        lastName: "",
         role: "",
         phone: "",
         whatsappOn: false,

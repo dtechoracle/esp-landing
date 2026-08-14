@@ -40,6 +40,8 @@ function roleColor(role?: string): { bg: string; color: string } {
 function matchesSearch(s: WaitlistEntry, needle: string): boolean {
   const hay = [
     s.email,
+    s.firstName,
+    s.lastName,
     s.name,
     s.phone,
     roleLabel(s.role),
@@ -142,9 +144,8 @@ export default function Subscribers() {
   function exportCsv() {
     const header = "first_name,last_name,email,role,phone,whatsapp,joined";
     const lines = rows.map((s) => {
-      const nameParts = (s.name || "").split(" ");
-      const firstName = nameParts[0] || "";
-      const lastName = nameParts.slice(1).join(" ") || "";
+      const firstName = s.firstName || (s.name || "").split(" ")[0] || "";
+      const lastName = s.lastName || (s.name || "").split(" ").slice(1).join(" ") || "";
       return [
         firstName,
         lastName,
@@ -300,9 +301,8 @@ export default function Subscribers() {
             ) : (
               rows.map((s) => {
                 const colors = roleColor(s.role);
-                const nameParts = (s.name || "").split(" ");
-                const firstName = nameParts[0] || "—";
-                const lastName = nameParts.slice(1).join(" ") || "—";
+                const firstName = s.firstName || (s.name || "").split(" ")[0] || "—";
+                const lastName = s.lastName || (s.name || "").split(" ").slice(1).join(" ") || "—";
                 return (
                   <tr key={s._id || s.email} style={{ borderBottom: "1px solid var(--line-100)" }}>
                     <td style={tdStyle}>

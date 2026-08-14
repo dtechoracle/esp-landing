@@ -18,6 +18,8 @@ export type WaitlistEntry = {
   _id?: string;
   email?: string;
   name?: string;
+  firstName?: string;
+  lastName?: string;
   role?: string;
   phone?: string;
   whatsappOn?: boolean;
@@ -44,6 +46,8 @@ export function clearToken(): void {
 /* ---- waitlist signup (public landing form) ---- */
 export async function waitlistSignup(input: {
   email: string;
+  firstName?: string;
+  lastName?: string;
   name?: string;
   role?: string;
   whatsappOn?: boolean;
@@ -259,6 +263,8 @@ export async function fetchWaitlist(
       _id: typeof e._id === "string" ? e._id : undefined,
       email: typeof e.email === "string" ? e.email : undefined,
       name: typeof e.name === "string" ? e.name : undefined,
+      firstName: typeof e.firstName === "string" ? e.firstName : undefined,
+      lastName: typeof e.lastName === "string" ? e.lastName : undefined,
       role: typeof e.role === "string" ? e.role : undefined,
       phone: typeof e.phone === "string" ? e.phone : undefined,
       whatsappOn: typeof e.whatsappOn === "boolean" ? e.whatsappOn : undefined,

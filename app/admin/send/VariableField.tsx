@@ -19,6 +19,8 @@ const VAR_META: Record<string, VarMeta> = {
 export type PreviewRecipient = {
   email: string;
   name?: string;
+  firstName?: string;
+  lastName?: string;
   vars: TemplateVars;
 };
 

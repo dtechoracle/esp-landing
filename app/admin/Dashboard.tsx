@@ -21,7 +21,7 @@ export default function Dashboard() {
   const token = useAdminAuth();
   const [total, setTotal] = useState<number | null>(null);
   const [recent, setRecent] = useState<
-    { _id?: string; email?: string; name?: string; createdAt?: string }[]
+    { _id?: string; email?: string; name?: string; firstName?: string; lastName?: string; createdAt?: string }[]
   >([]);
   const [campaigns, setCampaigns] = useState<BroadcastCampaign[]>([]);
   const [totalEmailsSent, setTotalEmailsSent] = useState<number | null>(null);
@@ -177,7 +177,9 @@ export default function Dashboard() {
                 <div style={{ overflow: "hidden" }}>
                   <div style={{ fontSize: 14, fontWeight: 600 }}>{s.email}</div>
                   <div style={{ fontSize: 12, color: "var(--text-muted)" }}>
-                    {s.name || "—"}
+                    {s.firstName || s.lastName
+                      ? `${s.firstName || "—"} ${s.lastName || ""}`
+                      : s.name || "—"}
                   </div>
                 </div>
                 <span style={{ fontSize: 12, color: "var(--text-faint)", whiteSpace: "nowrap" }}>

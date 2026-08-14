@@ -251,6 +251,8 @@ export default function WaitlistForm() {
     try {
       const result = await waitlistSignup({
         email: email.trim(),
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
         name: `${firstName.trim()} ${lastName.trim()}`,
         role,
         whatsappOn,

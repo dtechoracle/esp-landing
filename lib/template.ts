@@ -3,6 +3,8 @@ export type TemplateVars = Record<string, string>;
 export type TemplateRecipient = {
   email?: string;
   name?: string;
+  firstName?: string;
+  lastName?: string;
   role?: string;
   phone?: string;
   whatsappOn?: boolean;
@@ -38,10 +40,9 @@ function roleLabel(role?: string): string {
 }
 
 export function buildTemplateVars(sub: TemplateRecipient): TemplateVars {
-  const fullName = (sub.name || "").trim();
-  const parts = fullName.split(/\s+/);
-  const firstName = parts[0] || "";
-  const lastName = parts.slice(1).join(" ");
+  const firstName = (sub.firstName || "").trim() || (sub.name || "").trim().split(/\s+/)[0] || "";
+  const lastName = (sub.lastName || "").trim() || (sub.name || "").trim().split(/\s+/).slice(1).join(" ") || "";
+  const fullName = (sub.name || "").trim() || (firstName && lastName ? `${firstName} ${lastName}` : firstName || "");
   const date = sub.createdAt
     ? new Date(sub.createdAt).toLocaleDateString()
     : "";
