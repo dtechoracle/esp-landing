@@ -1,5 +1,5 @@
 export const DEFAULT_BACKEND_BASE_URL =
-  "https://eventspacepro-backend-6nvx.onrender.com";
+  "https://eventspacepro-backend.onrender.com";
 
 const TOKEN_KEY = "esp_admin_token";
 
