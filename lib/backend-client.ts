@@ -1,17 +1,14 @@
-export const DEFAULT_BACKEND_BASE_URL =
-  "https://eventspacepro-backend.onrender.com";
-
 const TOKEN_KEY = "esp_admin_token";
 
-/** Base URL of the hosted backend. Override with NEXT_PUBLIC_BACKEND_BASE_URL. */
+/** Base URL of the backend, supplied at build time by the deployment environment. */
 export function backendBaseUrl(): string {
-  if (
-    typeof process !== "undefined" &&
-    process.env.NEXT_PUBLIC_BACKEND_BASE_URL
-  ) {
-    return process.env.NEXT_PUBLIC_BACKEND_BASE_URL;
+  const baseUrl = process.env.NEXT_PUBLIC_BACKEND_BASE_URL?.trim();
+  if (!baseUrl) {
+    throw new Error(
+      "NEXT_PUBLIC_BACKEND_BASE_URL is required to contact the backend."
+    );
   }
-  return DEFAULT_BACKEND_BASE_URL;
+  return baseUrl.replace(/\/$/, "");
 }
 
 export type WaitlistEntry = {
