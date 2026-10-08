@@ -318,3 +318,77 @@ export async function adminCreateUser(
     user: data?.user || data, // Handle both structures {user: ...} and {...}
   };
 }
+
+/* ---- get all users (GET /api/admin/users with Bearer token) ---- */
+export async function fetchAdminUsers(
+  token: string
+): Promise<{ ok: boolean; status?: number; message?: string; users?: any[] }> {
+  let res: Response;
+  try {
+    res = await fetch(`${backendBaseUrl()}/api/admin/users`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+  } catch {
+    return { ok: false, status: 0, message: "Cannot reach the server." };
+  }
+
+  let data: any = null;
+  try {
+    data = await res.json();
+  } catch {}
+
+  if (!res.ok) {
+    return {
+      ok: false,
+      status: res.status,
+      message: data?.message || data?.error || `Failed to fetch users (HTTP ${res.status}).`,
+    };
+  }
+
+  return {
+    ok: true,
+    status: res.status,
+    users: data?.data || data?.users || (Array.isArray(data) ? data : []),
+  };
+}
+
+/* ---- delete user (DELETE /api/admin/users/:id with Bearer token) ---- */
+export async function adminDeleteUser(
+  token: string,
+  userId: string
+): Promise<{ ok: boolean; status?: number; message?: string }> {
+  let res: Response;
+  try {
+    res = await fetch(`${backendBaseUrl()}/api/admin/users/${userId}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  } catch {
+    return { ok: false, status: 0, message: "Cannot reach the server." };
+  }
+
+  let data: any = null;
+  try {
+    data = await res.json();
+  } catch {}
+
+  if (!res.ok) {
+    return {
+      ok: false,
+      status: res.status,
+      message: data?.message || data?.error || `Failed to delete user (HTTP ${res.status}).`,
+    };
+  }
+
+  return {
+    ok: true,
+    status: res.status,
+    message: data?.message,
+  };
+}
