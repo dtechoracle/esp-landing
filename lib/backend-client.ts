@@ -279,7 +279,8 @@ export async function adminCreateUser(
   token: string,
   payload: {
     email: string;
-    fullName: string;
+    firstName: string;
+    lastName: string;
     password?: string;
   }
 ): Promise<{ ok: boolean; status?: number; message?: string; user?: any }> {

@@ -8,7 +8,8 @@ import AdminShell from "../components/AdminShell";
 export default function UsersClient() {
   const router = useRouter();
   const [email, setEmail] = useState("");
-  const [fullName, setFullName] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [password, setPassword] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [message, setMessage] = useState("");
@@ -26,14 +27,15 @@ export default function UsersClient() {
     setMessage("");
     setCreatedUser(null);
 
-    const res = await adminCreateUser(token, { email, fullName, password });
+    const res = await adminCreateUser(token, { email, firstName, lastName, password });
 
     if (res.ok) {
       setStatus("success");
       setMessage("User created successfully.");
       setCreatedUser(res.user);
       setEmail("");
-      setFullName("");
+      setFirstName("");
+      setLastName("");
       setPassword("");
     } else {
       setStatus("error");
@@ -124,17 +126,17 @@ export default function UsersClient() {
 
             <div>
               <label
-                htmlFor="fullName"
+                htmlFor="firstName"
                 style={{ display: "block", fontSize: 14, fontWeight: 500, marginBottom: 6 }}
               >
-                Full name
+                First name
               </label>
               <input
-                id="fullName"
+                id="firstName"
                 type="text"
                 required
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
                 style={{
                   width: "100%",
                   padding: "10px 12px",
@@ -143,7 +145,32 @@ export default function UsersClient() {
                   fontSize: 15,
                   boxSizing: "border-box",
                 }}
-                placeholder="Jane Doe"
+                placeholder="Jane"
+              />
+            </div>
+
+            <div>
+              <label
+                htmlFor="lastName"
+                style={{ display: "block", fontSize: 14, fontWeight: 500, marginBottom: 6 }}
+              >
+                Last name
+              </label>
+              <input
+                id="lastName"
+                type="text"
+                required
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                style={{
+                  width: "100%",
+                  padding: "10px 12px",
+                  borderRadius: "var(--radius-md)",
+                  border: "1px solid var(--line-300)",
+                  fontSize: 15,
+                  boxSizing: "border-box",
+                }}
+                placeholder="Doe"
               />
             </div>
 
