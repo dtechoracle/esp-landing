@@ -17,6 +17,8 @@ export default function UsersClient() {
 
   const [users, setUsers] = useState<any[]>([]);
   const [loadingUsers, setLoadingUsers] = useState(true);
+  const [selectedUserIds, setSelectedUserIds] = useState<string[]>([]);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     loadUsers();
@@ -30,6 +32,7 @@ export default function UsersClient() {
     if (res.ok && res.users) {
       setUsers(res.users);
     }
+    setSelectedUserIds([]);
     setLoadingUsers(false);
   }
 
@@ -38,11 +41,50 @@ export default function UsersClient() {
     const token = getToken();
     if (!token) return;
     
+    setIsDeleting(true);
     const res = await adminDeleteUser(token, userId);
     if (res.ok) {
       loadUsers(); // Refresh the list
     } else {
       alert(res.message || "Failed to delete user.");
+    }
+    setIsDeleting(false);
+  }
+
+  async function handleBatchDelete() {
+    if (selectedUserIds.length === 0) return;
+    if (!confirm(`Are you sure you want to delete the ${selectedUserIds.length} selected user(s)?`)) return;
+    const token = getToken();
+    if (!token) return;
+
+    setIsDeleting(true);
+    let successCount = 0;
+    for (const userId of selectedUserIds) {
+      const res = await adminDeleteUser(token, userId);
+      if (res.ok) successCount++;
+    }
+
+    if (successCount < selectedUserIds.length) {
+      alert(`Deleted ${successCount} out of ${selectedUserIds.length} users. Some failed.`);
+    }
+    
+    loadUsers();
+    setIsDeleting(false);
+  }
+
+  function toggleSelectAll(checked: boolean) {
+    if (checked) {
+      setSelectedUserIds(users.map(u => u._id || u.id));
+    } else {
+      setSelectedUserIds([]);
+    }
+  }
+
+  function toggleSelectUser(userId: string, checked: boolean) {
+    if (checked) {
+      setSelectedUserIds(prev => [...prev, userId]);
+    } else {
+      setSelectedUserIds(prev => prev.filter(id => id !== userId));
     }
   }
 
@@ -74,6 +116,9 @@ export default function UsersClient() {
       setMessage(res.message || "An error occurred.");
     }
   }
+
+  const allSelected = users.length > 0 && selectedUserIds.length === users.length;
+  const someSelected = selectedUserIds.length > 0 && !allSelected;
 
   return (
     <AdminShell>
@@ -169,7 +214,18 @@ export default function UsersClient() {
         >
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
             <h2 style={{ fontSize: 18, fontWeight: 600 }}>All Users</h2>
-            <button onClick={loadUsers} style={{ fontSize: 13, background: "none", border: "1px solid var(--line-300)", borderRadius: "var(--radius-md)", padding: "6px 12px", cursor: "pointer" }}>Refresh</button>
+            <div style={{ display: "flex", gap: 12 }}>
+              {selectedUserIds.length > 0 && (
+                <button 
+                  onClick={handleBatchDelete} 
+                  disabled={isDeleting}
+                  style={{ fontSize: 13, background: "var(--error-50)", color: "var(--error-600)", border: "none", borderRadius: "var(--radius-md)", padding: "6px 12px", cursor: isDeleting ? "not-allowed" : "pointer", fontWeight: 500, opacity: isDeleting ? 0.5 : 1 }}
+                >
+                  {isDeleting ? "Deleting..." : `Delete Selected (${selectedUserIds.length})`}
+                </button>
+              )}
+              <button onClick={loadUsers} style={{ fontSize: 13, background: "none", border: "1px solid var(--line-300)", borderRadius: "var(--radius-md)", padding: "6px 12px", cursor: "pointer" }}>Refresh</button>
+            </div>
           </div>
 
           {loadingUsers ? (
@@ -181,6 +237,15 @@ export default function UsersClient() {
               <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14, textAlign: "left" }}>
                 <thead>
                   <tr style={{ borderBottom: "1px solid var(--line-300)", color: "var(--text-muted)" }}>
+                    <th style={{ padding: "12px 8px", width: 40 }}>
+                      <input 
+                        type="checkbox" 
+                        checked={allSelected}
+                        ref={el => { if (el) el.indeterminate = someSelected; }}
+                        onChange={(e) => toggleSelectAll(e.target.checked)}
+                        style={{ cursor: "pointer" }}
+                      />
+                    </th>
                     <th style={{ padding: "12px 8px", fontWeight: 600 }}>Name</th>
                     <th style={{ padding: "12px 8px", fontWeight: 600 }}>Email</th>
                     <th style={{ padding: "12px 8px", fontWeight: 600 }}>Created</th>
@@ -188,32 +253,46 @@ export default function UsersClient() {
                   </tr>
                 </thead>
                 <tbody>
-                  {users.map((user) => (
-                    <tr key={user._id || user.id} style={{ borderBottom: "1px solid var(--line-200)" }}>
-                      <td style={{ padding: "12px 8px" }}>{user.firstName} {user.lastName}</td>
-                      <td style={{ padding: "12px 8px", color: "var(--text-muted)" }}>{user.email}</td>
-                      <td style={{ padding: "12px 8px", color: "var(--text-muted)" }}>
-                        {new Date(user.createdAt).toLocaleDateString()}
-                      </td>
-                      <td style={{ padding: "12px 8px", textAlign: "right" }}>
-                        <button
-                          onClick={() => handleDelete(user._id || user.id)}
-                          style={{
-                            background: "var(--error-50)",
-                            color: "var(--error-600)",
-                            border: "none",
-                            borderRadius: "var(--radius-sm)",
-                            padding: "6px 10px",
-                            cursor: "pointer",
-                            fontWeight: 500,
-                            fontSize: 13,
-                          }}
-                        >
-                          Delete
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
+                  {users.map((user) => {
+                    const id = user._id || user.id;
+                    const isSelected = selectedUserIds.includes(id);
+                    return (
+                      <tr key={id} style={{ borderBottom: "1px solid var(--line-200)", background: isSelected ? "var(--surface-sunken-2)" : "transparent" }}>
+                        <td style={{ padding: "12px 8px" }}>
+                          <input 
+                            type="checkbox" 
+                            checked={isSelected}
+                            onChange={(e) => toggleSelectUser(id, e.target.checked)}
+                            style={{ cursor: "pointer" }}
+                          />
+                        </td>
+                        <td style={{ padding: "12px 8px" }}>{user.firstName} {user.lastName}</td>
+                        <td style={{ padding: "12px 8px", color: "var(--text-muted)" }}>{user.email}</td>
+                        <td style={{ padding: "12px 8px", color: "var(--text-muted)" }}>
+                          {new Date(user.createdAt).toLocaleDateString()}
+                        </td>
+                        <td style={{ padding: "12px 8px", textAlign: "right" }}>
+                          <button
+                            onClick={() => handleDelete(id)}
+                            disabled={isDeleting}
+                            style={{
+                              background: "var(--error-50)",
+                              color: "var(--error-600)",
+                              border: "none",
+                              borderRadius: "var(--radius-sm)",
+                              padding: "6px 10px",
+                              cursor: isDeleting ? "not-allowed" : "pointer",
+                              fontWeight: 500,
+                              fontSize: 13,
+                              opacity: isDeleting ? 0.5 : 1
+                            }}
+                          >
+                            Delete
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
