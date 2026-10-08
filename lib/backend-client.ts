@@ -273,3 +273,47 @@ export async function fetchWaitlist(
 
   return { ok: true, entries };
 }
+
+/* ---- create user (POST /api/admin/users with Bearer token) ---- */
+export async function adminCreateUser(
+  token: string,
+  payload: {
+    email: string;
+    fullName: string;
+    password?: string;
+  }
+): Promise<{ ok: boolean; status?: number; message?: string; user?: any }> {
+  let res: Response;
+  try {
+    res = await fetch(`${backendBaseUrl()}/api/admin/users`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+  } catch {
+    return { ok: false, status: 0, message: "Cannot reach the server." };
+  }
+
+  let data: any = null;
+  try {
+    data = await res.json();
+  } catch {}
+
+  if (!res.ok) {
+    return {
+      ok: false,
+      status: res.status,
+      message: data?.message || data?.error || `Failed to create user (HTTP ${res.status}).`,
+    };
+  }
+
+  return {
+    ok: true,
+    status: res.status,
+    message: data?.message,
+    user: data?.user || data, // Handle both structures {user: ...} and {...}
+  };
+}

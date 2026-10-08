@@ -9,6 +9,7 @@ const navItems = [
   { href: "/admin", label: "Dashboard" },
   { href: "/admin/subscribers", label: "Subscribers" },
   { href: "/admin/send", label: "Send email" },
+  { href: "/admin/users", label: "Users" },
 ];
 
 function StatCard({
