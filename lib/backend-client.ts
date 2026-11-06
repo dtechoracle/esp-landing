@@ -392,3 +392,201 @@ export async function adminDeleteUser(
     message: data?.message,
   };
 }
+
+/* ---- get recent events for venue conversion (GET /api/admin/events/recent) ---- */
+export async function fetchAdminRecentEvents(
+  token: string
+): Promise<{ ok: boolean; status?: number; message?: string; events?: any[] }> {
+  let res: Response;
+  try {
+    res = await fetch(`${backendBaseUrl()}/api/admin/events/recent`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+  } catch {
+    return { ok: false, status: 0, message: "Cannot reach the server." };
+  }
+
+  let data: any = null;
+  try {
+    data = await res.json();
+  } catch {}
+
+  if (!res.ok) {
+    return {
+      ok: false,
+      status: res.status,
+      message: data?.message || `Failed to fetch events (HTTP ${res.status}).`,
+    };
+  }
+
+  return {
+    ok: true,
+    status: res.status,
+    events: data?.events || [],
+  };
+}
+
+/* ---- preview event for conversion (GET /api/admin/events/:id/preview) ---- */
+export async function fetchAdminPreviewEvent(
+  token: string,
+  eventId: string
+): Promise<{ ok: boolean; status?: number; message?: string; event?: any }> {
+  let res: Response;
+  try {
+    res = await fetch(`${backendBaseUrl()}/api/admin/events/${eventId}/preview`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+  } catch {
+    return { ok: false, status: 0, message: "Cannot reach the server." };
+  }
+
+  let data: any = null;
+  try {
+    data = await res.json();
+  } catch {}
+
+  if (!res.ok) {
+    return {
+      ok: false,
+      status: res.status,
+      message: data?.message || `Failed to preview event (HTTP ${res.status}).`,
+    };
+  }
+
+  return {
+    ok: true,
+    status: res.status,
+    event: data?.event,
+  };
+}
+
+/* ---- convert event to venue (POST /api/admin/venues/convert) ---- */
+export async function adminConvertVenue(
+  token: string,
+  payload: {
+    eventId: string;
+    venueName?: string;
+    venueSlug?: string;
+    address?: string;
+    capacity?: string;
+    description?: string;
+    customWidth?: number;
+    customHeight?: number;
+  }
+): Promise<{ ok: boolean; status?: number; message?: string; venue?: any }> {
+  let res: Response;
+  try {
+    res = await fetch(`${backendBaseUrl()}/api/admin/venues/convert`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+  } catch {
+    return { ok: false, status: 0, message: "Cannot reach the server." };
+  }
+
+  let data: any = null;
+  try {
+    data = await res.json();
+  } catch {}
+
+  if (!res.ok) {
+    return {
+      ok: false,
+      status: res.status,
+      message: data?.message || `Failed to convert venue (HTTP ${res.status}).`,
+    };
+  }
+
+  return {
+    ok: true,
+    status: res.status,
+    message: data?.message,
+    venue: data?.venue,
+  };
+}
+
+/* ---- list converted venues (GET /api/admin/venues) ---- */
+export async function fetchAdminVenues(
+  token: string
+): Promise<{ ok: boolean; status?: number; message?: string; venues?: any[] }> {
+  let res: Response;
+  try {
+    res = await fetch(`${backendBaseUrl()}/api/admin/venues`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+  } catch {
+    return { ok: false, status: 0, message: "Cannot reach the server." };
+  }
+
+  let data: any = null;
+  try {
+    data = await res.json();
+  } catch {}
+
+  if (!res.ok) {
+    return {
+      ok: false,
+      status: res.status,
+      message: data?.message || `Failed to fetch venues (HTTP ${res.status}).`,
+    };
+  }
+
+  return {
+    ok: true,
+    status: res.status,
+    venues: data?.venues || [],
+  };
+}
+
+/* ---- delete venue (DELETE /api/admin/venues/:id) ---- */
+export async function adminDeleteVenue(
+  token: string,
+  venueId: string
+): Promise<{ ok: boolean; status?: number; message?: string }> {
+  let res: Response;
+  try {
+    res = await fetch(`${backendBaseUrl()}/api/admin/venues/${venueId}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  } catch {
+    return { ok: false, status: 0, message: "Cannot reach the server." };
+  }
+
+  let data: any = null;
+  try {
+    data = await res.json();
+  } catch {}
+
+  if (!res.ok) {
+    return {
+      ok: false,
+      status: res.status,
+      message: data?.message || `Failed to delete venue (HTTP ${res.status}).`,
+    };
+  }
+
+  return {
+    ok: true,
+    status: res.status,
+    message: data?.message,
+  };
+}
