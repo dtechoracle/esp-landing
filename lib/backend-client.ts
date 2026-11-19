@@ -54,32 +54,45 @@ export type WaitlistSignupInput = {
 /* ---- waitlist signup (public landing form) ---- */
 export async function waitlistSignup(
   input: WaitlistSignupInput
-): Promise<{ ok: boolean; status: number; message?: string }> {
+): Promise<{ ok: boolean; status: number; message?: string; isDuplicate?: boolean }> {
   let res: Response;
   try {
-    res = await fetch(`${backendBaseUrl()}/api/waitlist`, {
+    res = await fetch("/api/waitlist", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(input),
     });
   } catch {
-    return {
-      ok: false,
-      status: 0,
-      message:
-        "Cannot reach the waitlist server. Please check your connection and try again.",
-    };
+    try {
+      res = await fetch(`${backendBaseUrl()}/api/waitlist`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(input),
+      });
+    } catch {
+      return {
+        ok: false,
+        status: 0,
+        message:
+          "Cannot reach the waitlist server. Please check your connection and try again.",
+      };
+    }
   }
 
-  let data: {
-    message?: unknown;
-    error?: unknown;
-    retryAfter?: unknown;
-  } | null = null;
+  let data: any = null;
   try {
     data = await res.json();
-  } catch {
-    // Non-JSON response; fall through to status-based handling.
+  } catch {}
+
+  if (res.status === 409) {
+    return {
+      ok: false,
+      status: 409,
+      isDuplicate: true,
+      message:
+        data?.message ||
+        "This email is already registered on the waitlist.",
+    };
   }
 
   if (res.status === 429) {

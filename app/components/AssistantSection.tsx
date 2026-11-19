@@ -78,6 +78,7 @@ export default function AssistantSection() {
           const visible = entry.isIntersecting;
           isVisibleRef.current = visible;
           if (visible) {
+            if (timerRef.current) clearTimeout(timerRef.current);
             runNextStep();
           } else {
             if (timerRef.current) clearTimeout(timerRef.current);
@@ -112,7 +113,11 @@ export default function AssistantSection() {
             Tell it the brief. Get the first draft.
           </h2>
           <ol className="steps-list" id="demo-steps">
-            <li className={activeStep === 0 ? "is-active" : ""}>
+            <li
+              className={activeStep === 0 ? "is-active" : ""}
+              onClick={() => setActiveStep(0)}
+              style={{ cursor: "pointer" }}
+            >
               <span className="ic">
                 <svg width="18" height="18">
                   <use href="#i-chat" />
@@ -123,7 +128,11 @@ export default function AssistantSection() {
                 <p>Guest count, seating style, must-haves. Plain words are enough.</p>
               </div>
             </li>
-            <li className={activeStep === 1 ? "is-active" : ""}>
+            <li
+              className={activeStep === 1 ? "is-active" : ""}
+              onClick={() => setActiveStep(1)}
+              style={{ cursor: "pointer" }}
+            >
               <span className="ic">
                 <svg width="18" height="18">
                   <use href="#i-spark" />
@@ -134,7 +143,11 @@ export default function AssistantSection() {
                 <p>The assistant places tables, stage, bars and dance floor on a precise grid.</p>
               </div>
             </li>
-            <li className={activeStep === 2 ? "is-active" : ""}>
+            <li
+              className={activeStep === 2 ? "is-active" : ""}
+              onClick={() => setActiveStep(2)}
+              style={{ cursor: "pointer" }}
+            >
               <span className="ic">
                 <svg width="18" height="18">
                   <use href="#i-move" />

@@ -328,17 +328,22 @@ export default function EarlyAccessForm() {
       const res = await waitlistSignup(payload);
       setIsSubmitting(false);
 
-      if (res.ok || res.status === 409) {
-        const isDup = res.status === 409;
-        setIsDuplicate(isDup);
+      if (res.ok) {
+        setIsDuplicate(false);
         setIsSuccess(true);
 
-        const delay = 2500 + (whatsappOn && !isDup ? 2500 : 0);
+        const delay = 3500 + (whatsappOn ? 2500 : 0);
         setTimeout(() => {
           window.location.href = CONTENT.SIGN_UP_URL;
         }, delay);
       } else {
-        setErrorMessage(res.message || "We couldn't add you just now. Please try again in a moment.");
+        const isDup = res.status === 409 || Boolean(res.isDuplicate);
+        setIsDuplicate(isDup);
+        setErrorMessage(
+          isDup
+            ? "This email is already registered on our waitlist."
+            : (res.message || "We couldn't add you just now. Please try again in a moment.")
+        );
       }
     } catch {
       setIsSubmitting(false);
@@ -421,20 +426,21 @@ export default function EarlyAccessForm() {
                   aria-label={`Country code: ${selectedCountry[2]} ${selectedCountry[1]}`}
                   onClick={() => setPickerOpen(!pickerOpen)}
                 >
-                  <span className="flag" id="cc-flag">
-                    {selectedCountry[0] === "ng" ? (
+                  {selectedCountry[0] === "ng" ? (
+                    <span className="flag" id="cc-flag">
                       <svg viewBox="0 0 3 2" width="21" height="14" aria-hidden="true">
                         <rect width="1" height="2" fill="#008751" />
                         <rect x="1" width="1" height="2" fill="#fff" />
                         <rect x="2" width="1" height="2" fill="#008751" />
                       </svg>
-                    ) : (
-                      <span
-                        className="flag sprite"
-                        style={{ backgroundPosition: flagPos(selectedCountry[3]) }}
-                      />
-                    )}
-                  </span>
+                    </span>
+                  ) : (
+                    <span
+                      className="flag sprite"
+                      id="cc-flag"
+                      style={{ backgroundPosition: flagPos(selectedCountry[3]) }}
+                    />
+                  )}
                   <span id="cc-code">{selectedCountry[1]}</span>
                   <svg
                     className="cc-chev"
@@ -543,9 +549,20 @@ export default function EarlyAccessForm() {
             <span>Add me to the WhatsApp channel for updates, tips and special offers</span>
           </label>
           {errorMessage && (
-            <p className="form-error" id="f-error" role="alert">
-              {errorMessage}
-            </p>
+            <div className="form-error" id="f-error" role="alert" style={{ marginBottom: 14 }}>
+              <div>{errorMessage}</div>
+              {isDuplicate && (
+                <div style={{ marginTop: 6, fontSize: 13, fontWeight: 500 }}>
+                  Already registered?{" "}
+                  <a
+                    href={CONTENT.LOG_IN_URL}
+                    style={{ color: "#0056A9", textDecoration: "underline", fontWeight: 600 }}
+                  >
+                    Log in to the app &rarr;
+                  </a>
+                </div>
+              )}
+            </div>
           )}
           <button className="btn btn-primary btn-lg btn-block" type="submit" id="f-submit" disabled={isSubmitting}>
             {isSubmitting ? "Sending…" : "Get early access"}
@@ -559,13 +576,15 @@ export default function EarlyAccessForm() {
               <use href="#i-check" />
             </svg>
           </div>
-          <h3 id="success-title">{isDuplicate ? "You're already on the list." : "You're in."}</h3>
-          <p id="success-msg">Taking you to sign-up…</p>
+          <h3 id="success-title">You&apos;re in!</h3>
+          <p id="success-msg">
+            We&apos;ve reserved your spot and sent the website &amp; app access link to your email. Taking you to create your account…
+          </p>
           <div className="actions">
             <a className="btn btn-primary btn-lg btn-block js-signup" href={CONTENT.SIGN_UP_URL}>
               Continue to sign-up
             </a>
-            {whatsappOn && !isDuplicate && CONTENT.SOCIALS.whatsapp && (
+            {whatsappOn && CONTENT.SOCIALS.whatsapp && (
               <a
                 className="btn btn-ghost btn-lg btn-block"
                 id="wa-channel-btn"
