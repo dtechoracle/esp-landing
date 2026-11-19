@@ -1,19 +1,45 @@
 import type { Metadata, Viewport } from "next";
+import { Inter } from "next/font/google";
 import "./globals.css";
+import SvgDefs from "./components/SvgDefs";
 
-const APP_NAME = "EventSpacePro";
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
-  title: "EventSpacePro — Design, book, and visualize event spaces",
+  metadataBase: new URL("https://www.eventspacepro.com"),
+  title: "EventSpacePro — AI event floor plans in 2D | See the space before it's set",
   description:
-    "EventSpacePro turns any venue into an editable 2D floor plan, a walkable 3D preview, and an AI assistant that lays out your event from a single prompt.",
-  applicationName: APP_NAME,
+    "Describe your event and get a to-scale 2D event floor plan drafted by AI in seconds, then fine-tune every table yourself. Built in Lagos.",
+  applicationName: "EventSpacePro",
+  alternates: {
+    canonical: "https://www.eventspacepro.com/",
+  },
   openGraph: {
-    title: "EventSpacePro — Design, book, and visualize event spaces",
-    description:
-      "Turns any venue into an editable 2D floor plan, a walkable 3D preview, and an AI layout assistant.",
     type: "website",
-    images: ["/assets/mainLogo.svg"],
+    siteName: "EventSpacePro",
+    url: "https://www.eventspacepro.com/",
+    title: "EventSpacePro — AI event floor plans in 2D",
+    description:
+      "See the space before it's set. Describe your event, get an AI first draft of your floor plan, then refine every table to scale.",
+    images: [
+      {
+        url: "/og-image.jpg",
+        width: 1200,
+        height: 630,
+        alt: "EventSpacePro: AI event floor plans in 2D. See the space before it's set.",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "EventSpacePro — AI event floor plans in 2D",
+    description:
+      "See the space before it's set. Describe your event, get an AI first draft of your floor plan, then refine every table to scale.",
+    images: ["/og-image.jpg"],
   },
 };
 
@@ -29,33 +55,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" className={inter.variable}>
       <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
-          rel="preconnect"
-          href="https://fonts.googleapis.com"
-        />
-        <link
-          rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossOrigin="anonymous"
-        />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=Instrument+Serif:ital@0;1&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
           rel="stylesheet"
         />
       </head>
       <body>
-        <div
-          id="top"
-          style={{
-            minHeight: "100vh",
-            display: "flex",
-            flexDirection: "column",
-          }}
-        >
-          {children}
-        </div>
+        <SvgDefs />
+        {children}
       </body>
     </html>
   );

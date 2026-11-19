@@ -40,8 +40,7 @@ export function clearToken(): void {
   window.localStorage.removeItem(TOKEN_KEY);
 }
 
-/* ---- waitlist signup (public landing form) ---- */
-export async function waitlistSignup(input: {
+export type WaitlistSignupInput = {
   email: string;
   firstName?: string;
   lastName?: string;
@@ -49,7 +48,13 @@ export async function waitlistSignup(input: {
   role?: string;
   whatsappOn?: boolean;
   phone?: string;
-}): Promise<{ ok: boolean; status: number; message?: string }> {
+  feedbackGroupConsentAt?: string;
+};
+
+/* ---- waitlist signup (public landing form) ---- */
+export async function waitlistSignup(
+  input: WaitlistSignupInput
+): Promise<{ ok: boolean; status: number; message?: string }> {
   let res: Response;
   try {
     res = await fetch(`${backendBaseUrl()}/api/waitlist`, {

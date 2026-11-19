@@ -1,23 +1,33 @@
-import Nav from "./components/Nav";
-import Hero from "./components/Hero";
-import Features from "./components/Features";
-import HowItWorks from "./components/HowItWorks";
-import Audiences from "./components/Audiences";
-import FAQ from "./components/FAQ";
+import Header from "./components/Header";
+import HeroSection from "./components/HeroSection";
+import TrustStrip from "./components/TrustStrip";
+import AssistantSection from "./components/AssistantSection";
+import FeaturesSection from "./components/FeaturesSection";
+import HowItWorksSection from "./components/HowItWorksSection";
+import ProofSection from "./components/ProofSection";
+import RolesSection from "./components/RolesSection";
+import FaqSection from "./components/FaqSection";
+import FinalCtaSection from "./components/FinalCtaSection";
 import Footer from "./components/Footer";
+import StickyCta from "./components/StickyCta";
 
 export default function Home() {
   return (
     <>
-      <Nav />
-      <main>
-        <Hero />
-        <Features />
-        <HowItWorks />
-        <Audiences />
-        <FAQ />
+      <Header />
+      <main id="top">
+        <HeroSection />
+        <TrustStrip />
+        <AssistantSection />
+        <FeaturesSection />
+        <HowItWorksSection />
+        <ProofSection />
+        <RolesSection />
+        <FaqSection />
+        <FinalCtaSection />
       </main>
       <Footer />
+      <StickyCta />
     </>
   );
 }
